@@ -1,0 +1,2767 @@
+"title","slug","content","tags"
+"Php Laravel Single table inheritance","php-laravel-single-table-inheritance","As i came into OOP (Object-oriented-programming) i started to learn the concept of  \"**Inheritance**\".  Inheritance itself is a cool stuff, but problems come when you need to save that object structure into a relational database: for example Mysql.
+This article is one of a series that will explain the best-practise approaches to solve that problem.<!-- more -->
+ Before going deeper into details i have to say that thoose concepts come from Martin fowler book: \"Pattern of enterprise architecture\" which i advise to anybody who wanna increase his skills in OOP Architectures. 
+There are four ways to do that:
+
+<ol>
+<li>Single table inheritance</li>
+<li>Class table inheritance</li>
+<li>Concrete table inheritance</li>
+<li>Semistructured data</li>
+</ol>
+
+In this article i'll talk about the first and easiest of them: **Single table inheritance**.
+
+<h3>Single table inheritance</h3>
+Single table inheritance is based on mapping all the class hierarchy on a single table and using a custom field to define which type of class is saved in each row. I'll explain that with a simple example.
+Imagine the hierarchy of animals and in particular dogs and cats, they both are pets and but they are also animals. Imagine now that every animal have the attribute sex, pet have name and dog collar.
+Here is the UML diagram of the class structure:
+
+ ![file](/img/image-1387843145287.png)
+
+And here is the code that creates the structure in the db following the pattern:
+~~~~~~~~~~~~~~~~~~~~~
+CREATE TABLE ANIMALS (ID int NOT NULL AUTO_INCREMENT, Sex Varchar(255), Name Varchar(255), Collar Varcar(255), Type Varchar(50), PRIMARY KEY ID);
+~~~~~~~~~~~~~~~~~~~~~
+
+What we are doing is to map every node of the hierarchy on the same table, the table contains all the attributes in the hierarchy and also the attribute: \"Type\" to disntinguish the type of data being saved. 
+
+To be more clear here is an example of the code to insert a new dog:
+~~~~~~~~~~~~~~~~~~~~~
+INSERT INTO ANIMALS (Type, Sex, Name, Collar) VALUES (\"Dog\", \"M\", \"Bobby\", \"black\");
+~~~~~~~~~~~~~~~~~~~~~
+And here is and example to insert a new cat:
+~~~~~~~~~~~~~~~~~~~~~
+INSERT INTO ANIMALS (Type, Sex, Name, Collar) VALUES (\"Cat\",\"M\", \"Tom\" );
+~~~~~~~~~~~~~~~~~~~~~
+
+The advantages of **Single table inheritance** are:
+<ul>
+<li>Is simple</li>
+<li>Moving column between hierarchy doesnt require db changes</li>
+<li>Fits well with Active record pattern (Planning an article for that)</li>
+</ul>
+ The weakness of this implementation are:
+ <ul>
+<li>There is no metadata to define which attribute belongs to wich subtype: looking table diretly is a bit weird</li>
+<li>The table will quiclky become a bottleneck if you create many hierarchies</li>
+<li>You waste some space with empty columns(depending on dmbs compression of nulls)</li>
+</ul>
+
+To handle this problem automatically with **Laravel Framework** i've created a package called **\"laravel-single-table-inheritance\"** that you can find [here on github](https://github.com/intrip/laravel-single-table-inheritance).
+<br/>In the case you are using doctrine ORM you should check this [examples](http://docs.doctrine-project.org/en/latest/reference/inheritance-mapping.html).
+If you want to understand more about object oriented inheritance follow the guide with [Class table inheritance](http://www.jacopobeschi.com/post/php-class-table-inheritance)
+
+
+If you liked this article: <a href=\"https://twitter.com/JacopoBeschi\" class=\"twitter-follow-button\" data-show-count=\"false\" data-lang=\"en\">Follow me</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\"//platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>
+","design pattern,laravel"
+"Php class table inheritance","php-class-table-inheritance","In the previous article i talked about [Single table inheritance](/post/php-laravel-single-table-inheritance) which is one of the four ways to map inheritance into RDBMS (Relational Database Management System). As stated in the other article this pattern comes from Marwin fowler PoEAA Book. In this one we talk about **Class table inheritance**. Class table inheritance is an approach that consist in creating a table for each class in the object-model. 
+<!-- more -->
+To explain that let's use the example used in the other post: 
+imagine the hierarchy of animals and in particular dogs and cats, they both are pets and but they are also animals. Imagine now that every animal have the attribute sex, pet have name and dog collar.
+Here is the UML diagram of the class structure:
+
+ ![file](/img/image-1387843145287.png)
+
+And here is the code that creates the structure in the db following the pattern:
+
+~~~~~~~~~~~~~~~~~~~~~
+CREATE TABLE ANIMAL (ID int NOT NULL AUTO_INCREMENT, Sex Varchar(255), PRIMARY KEY ID);
+~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~
+CREATE TABLE PET (ID int NOT NULL, Name Varchar(255), PRIMARY KEY ID, FOREIGN KEY (ID) REFERENCES ANIMAL(ID) );
+~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~
+CREATE TABLE DOG (ID int NOT NULL, Collar Varchar(255), PRIMARY KEY ID, FOREIGN KEY (ID) REFERENCES PET(ID) );
+~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~
+CREATE TABLE CAT (ID int NOT NULL, PRIMARY KEY ID, FOREIGN KEY (ID) REFERENCES PET(ID) );
+~~~~~~~~~~~~~~~~~~~~~
+
+As you can see with **Class table inheritance** we create a table for every class; note that we use the **ID** of every subclass as a foreign key for the parent class, in this way we have the same key for the set of tables rappresenting the same leaf class in the hierarchy.
+
+The advantages of this approach are:
+
+<ul>
+<li>You don't waste any space: every column is relative to the right class.</li>
+<li>It's easy to see the relation between database and classes.</li>
+</ul>
+
+There are some disadvantages with this approach aswell:
+
+<ul>
+<li>Every time you load or save an object you need to check multiple tables (Many joins)</li>
+<li>Moving fields up and down with the hierarchy requires db changes</li>
+<li>The top table class may become a bottleneck</li>
+</ul>
+
+If you use Laravel framework and want to implement that with his ORM Eloquent you may land in some big troubles: in fact this pattern doesn't fit well with Active Record (Pattern used by Eloquent). Aniways i'm planning to write and article explaining how you can implement that (Mostly proof of concept). My strong advise in the case you wanna use this pattern is to use that with [Doctrine ORM](http://docs.doctrine-project.org/en/latest/reference/inheritance-mapping.html). Aniways there are some other orm that support that built-in like [propel orm](http://propelorm.org/).
+
+Well, that's all for today. Enjoy!
+
+If you liked this article: <a href=\"https://twitter.com/JacopoBeschi\" class=\"twitter-follow-button\" data-show-count=\"false\" data-lang=\"en\">Follow me</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\"//platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>
+
+","design pattern"
+"laravel form handling with event-driven code","laravel-form-handling-with-events","Hello guys, how many times you have created a form that has to handle many complicated tasks? If the answer is \"**many**\" i have one way for handling that in a very fashioned way based on **events** using laravel framework 4+. The proof of concept in OOP is the **\"Chain of responsabiity\"** design pattern. Imagine now that when we process a form we want to execute a list of action consequently, in the case one of them would fail we will return an error, otherwise we return a success message. <!-- more -->As an example i will show you how to create a simple contact form. What that form should handle? 
+<ol>
+<li>Validate user data</li>
+<li>Save user data into db</li>
+<li>Send email to the contact mail</li>
+<li>Eventually send a notification mail to the user</li>
+<li> Some other stuff</li>
+</ol>
+
+Keep in mind ther every of thoose steps may land in failure: for example validation or the server couldn't send the email.
+let's keep this as simple as possible to focus on the base concept.
+Let's start by creating a form, (for that i use the [way/form package](https://packagist.org/packages/way/form) ).
+Create a new file view called form1.blade.php in app/views folder.
+Fill it with the given code:
+
+	{{Form::open(array('url' => URL::action(\"HomeController@postContact\"), 'method' => 'post') )}}
+	{{FormField::name(array('label' => \"Name*\") )}}
+	<span class=\"text-danger\">{{$errors->first('name')}}</span>
+	{{FormField::email(array('label' => 'Email*') )}}
+	<span class=\"text-danger\">{{$errors->first('email')}}</span>
+	{{FormField::body(array('label' => 'Message*' ))}}
+	<span class=\"text-danger\">{{$errors->first('body')}}</span>
+	{{Form::submit('Send message', array(\"class\"=>\"btn btn-large btn-primary\"))}}
+	{{Form::close()}}
+
+This will create a simple form looking like this:
+
+![file](http://www.jacopobeschi.com/img/image-1389133286160.png)
+
+At this point we need to create the controller actions(one for get and one for post) and then register them in the route files. Lets start creating them in the controller. Open the file \"app/controllers/HomeController.php\" and fill it with the given values:
+
+    public function getContact()
+    {
+	        return View::make('form1');
+    }
+
+    public function postContact()
+    {
+		// todo 
+		// validate data
+		// save user data
+		// send emails
+		// some other stuff
+		// return to getContact with success or error
+    }
+	
+Now lets register the routes, open file app/routes.php and fill it with this code:
+
+	Route::post('/contact','HomeController@postContact');
+	Route::get('/contact','HomeController@getContact');
+
+As you can see what we did until now is a common approach to create a form with laravel, in the postContact is where we usualy handle all the stuff related to the form. As you imagine putting them right inside the post method may be working when you do simple stuff but as the code is growing you will find a lot of issues. Here comes the fun part: **form handling with event-driven code**.
+
+Let's change the post method in this way:
+
+	public function postContact()
+    {
+        // grab the data
+        $input = Input::all();
+        // create empty messages
+        $messages = new Illuminate\\Support\\MessageBag();
+
+        // if all events execute successfully
+        if (Event::fire('post.submit', array($input, $messages)) )
+        {
+            // return to the form with success messages
+            return Redirect::action('HomeController@getContact')->with('message', $messages);
+        }
+        else
+        {
+            // return to the form with errors
+            return Redirect::action('HomeController@getContact')->with('errors', $messages)->withInput();
+        }
+
+    }
+
+Instead of executing one action after another what we do is to throw an event (in this case post.submit); when an event is thrown it can be catched by events listener, thoose listener will try to execute some operations: if they execute them successfully they will return true, otherwise they will set an error message and return false. In the case all the events listening execute with success the controller will redirect to getContact with success, otherwise it will redirect to getContact with error messages. 
+At this point come naturally two questions: where are binded thoose event listener and what action you associate with them?
+The first answer is: you could put them everywhere, but a good position for them could be in the constructor of the controller; if you prefer you can also put them in a serviceProvider (in the boot method). In this example i'll bind them in the controller construct like that:
+  
+	public function __construct()
+    {
+        // validate data
+        Event::listen('post.submit', \"EventHandling\\\\ValidateForm@run\",1);
+        // save user data
+        Event::listen('post.submit', \"EventHandling\\\\SaveData@run\",0);
+        // add more events for...
+        // send emails
+        // some other stuff
+
+    }
+
+As you can se some other action are just written as comment, that's because this article is mainly a proof of concept and you should implement them as your needs. Now lets see how is scructured a base event handler, for example: \"EventHandling\\\\ValidateForm\".
+
+	<?php namespace EventHandling;
+
+	class ValidateForm
+	{
+    public function run($input, $messages)
+	  {
+		  // validate the code
+		  // or do a bunch of stuff
+  
+		  // if something goes wrong
+		  // set the message: in this case error message
+		  $messages->add(\"email\", \"email error\");
+		  // stop the other events
+		  return false;
+  
+		  // otherwise
+		  return true;
+	  }
+	}
+	
+This method is also a dummy method but is enough to show the concept, what we do here is get the form input and the messages array. Inside the run method we just do some actions(for example validate the data) and then in case of success return true, otherwhise we set the error message and return false. In the case we return false the propagation to the other methods it's stopped. In this way we can execute many action in sequence. In case you write the database with your event handler you should start a transaction before firing the \"post.submit\" in the postContact() method of the controller and then , otherwise rollback to the previous state.
+
+This way of handling form is also good for testabiliby. In fact you can swap the event listener with a mock and test the controller. Then you can test every EventHandler in isolation and have a complete testability for the form.
+Here is an example on how to do a simple test on the controller:
+
+	/**
+	 * Simple test to check form redirect.
+	 *
+	 * @return void
+	 */
+	public function testSubmitPost()
+	{
+        Event::shouldReceive('listen','listen,','fire');
+
+        $this->call('POST', '/contact');
+
+        $this->assertRedirectedToAction('HomeController@getContact');
+	}
+	
+As you can see with  \"Event::shouldReceive('listen','listen,','fire')\" we simply mock the events, at this point if you need you can swap the implementations with your own mock.
+Thats' it for now folks! If you have some question write a comment below and i'll be happy to answer your question! And remember to <a href=\"https://twitter.com/JacopoBeschi\" class=\"twitter-follow-button\" data-show-count=\"false\" data-lang=\"en\"> Follow me</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\"//platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>","laravel"
+"Active Record Design pattern","active-record-design-pattern","Hello folks, in this article i'll briefly explain the **Active record** design pattern. Active record is one of the **data access pattern** which helps you to map your domain model (Object) into Relational Database. Basically with active record, every istance of your class correspond to one row in a table of the database (one to one relationship).
+The active record basic usage consist in extending the abstract active record class from your model class. With this pattern the biggest advantage it's simplicity, in fact this pattern is used in many ORM, for example Laravel ORM Eloquent, Yii ORM, FuelPHP ORM or Ruby on Rails ORM. I'll show you how that works with a simple example. 
+<!-- more -->
+I've created a class that implement the active record pattern(keep in mind it's really simple and to be used well need to be expanded). As i'm used to do i'll explain that by examples, now imagine we have the MobilePhone Class, which have the following attributes:
+
+<ul>
+<li><b>name</b></li>
+<li><b>company</b></li>
+</ul>
+
+We want to save that data into a Database with the Active record pattern class. The table associated to the class can be created with the following script:
+
+	CREATE TABLE IF NOT EXISTS `phone` (
+  	`id` int(11) NOT NULL AUTO_INCREMENT,
+  	`name` varchar(255) NOT NULL,
+  	`company` varchar(255) NOT NULL,
+  	PRIMARY KEY (`id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+
+The table class have this code:
+
+	class MobilePhone extends ActiveRecordModel
+	{
+    protected $table_name = 'phone';
+    protected $username ='root';
+    protected $password = 'root';
+    protected $hostname = 'localhost';
+    protected $dbname = 'activerecord';
+	}
+
+As you can see the MobilePhone class extends ActiveRecordModel and has some proprieties to know how to connect to the database.  
+<h3>Insert data</h3>
+You can insert a new MobilePhone with the following code.
+
+	// create a new phone
+	$phone = new MobilePhone(array(
+   	 \"name\" => \"cool phone\",
+   	 \"company\" => \"nekia\"
+	));
+
+	// save it
+	$phone->save();
+	
+This looks really simple, lets take a look on how the ActiveRecordModel lets you do that:
+
+	abstract class ActiveRecordModel
+	{
+    /**
+     * The attributes that belongs to the table
+     * @var  Array
+     */
+    protected $attributes = array();
+    /**
+     * Table name
+     * @var  String
+     */
+    protected $table_name;
+    /**
+     * Username
+     * @var String
+     */
+    protected $username;
+    /**
+     * password
+     * @var  String
+     */
+    protected $password;
+    /**
+     * The DBMS hostname
+     * @var  String
+     */
+    protected $hostname;
+    /**
+     * The database name
+     * @var  String
+     */
+    protected $dbname;
+    /**
+     * The DBMS connection port
+     * @var  String
+     */
+    protected $port = \"3306\";
+
+    protected $id_name = 'id';
+  
+    function __construct(Array $attributes = null) {
+        $this->attributes = $attributes;
+    }
+    public function __set($key, $value)
+    {
+        $this->setAttribute($key, $value);
+    }
+    public function newInstance(array $data)
+    {
+        $class_name = get_class($this);
+        return new  $class_name($data);
+    }
+
+    /**
+     * Save the model
+     * @return bool
+     */
+    public function save()
+    {
+        try
+        {
+            if(array_key_exists($this->id_name, $this->attributes))
+            {
+                $attributes = $this->attributes;
+                unset($attributes[$this->id_name]);
+                $this->update($attributes);
+            }
+            else
+            {
+                $id = $this->insert($this->attributes);
+                $this->setAttribute($this->id_name, $id);
+            }
+        }
+        catch(ErrorException $e)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Used to prepare the PDO statement
+     *
+     * @param $connection
+     * @param $values
+     * @param $type
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    protected function prepareStatement($connection, $values, $type)
+    {
+        if($type == \"insert\")
+        {
+        $sql = \"INSERT INTO {$this->table_name} (\";
+        foreach ($values as $key => $value) {
+            $sql.=\"{$key}\";
+            if($value != end($values) )
+                $sql.=\",\";
+        }
+        $sql.=\") VALUES(\";
+        foreach ($values as $key => $value) {
+            $sql.=\":{$key}\";
+            if($value != end($values) )
+                $sql.=\",\";
+        }
+        $sql.=\")\";
+        }
+        elseif($type == \"update\")
+        {
+            $sql = \"UPDATE {$this->table_name} SET \";
+            foreach ($values as $key => $value) {
+                $sql.=\"{$key} =:{$key}\";
+                if($value != end($values))
+                    $sql.=\",\";
+            }
+            $sql.=\" WHERE {$this->id_name}=:{$this->id_name}\";
+        }
+        else
+        {
+            throw new InvalidArgumentException(\"PrepareStatement need to be insert,update or delete\");
+        }
+
+        return $connection->prepare($sql);
+    }
+
+    /**
+     * Used to insert a new record
+     * @param array $values
+     * @throws ErrorException
+     */
+    public function insert(array $values)
+    {
+        $connection = $this->getConnection();
+        $statement = $this->prepareStatement($connection, $values, \"insert\");
+        foreach($values as $key => $value)
+        {
+            $statement->bindValue(\":{$key}\", $value);
+        }
+
+        $success = $statement->execute($values);
+        if(! $success)
+            throw new ErrorException;
+
+        return $connection->lastInsertId();
+    }
+
+    /**
+     * Get the connection to the database
+     *
+     * @throws  PDOException
+     */
+    protected function getConnection()
+    {
+        try {
+            $conn = new PDO(\"mysql:host={$this->hostname};dbname={$this->dbname};port=$this->port\", $this->username, $this->password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            return $conn;
+        } catch(PDOException $e) {
+            echo 'ERROR: ' . $e->getMessage();
+        }
+    }
+}
+
+What the ActiveRecordClass does when we set the attributes is to call the magic method \"__set()\" which will set the values in his protected $attributes properties array (they are the same as the columns in the table); in this particular case we setted the data in the constructor which instantly populated the **$attributes** array (check __construct() method). 
+Then we call the save method, that method calls the insert method passing him the values contained in **$attributes**, the insert method will create a new connection and then insert a new row filling the column values with the corresponding **$key->value** pairs of the $attributes array then returns the id of the new row which is setted as property in the $attributes by the save method.
+
+<h3>Update data</h3>
+After you have created a new model you can change his proprieties in the database with the update method: you can just call $model->update(array(\"newvalue\"=>\"value)) or you can set the proprerty with $model->newvalue = \"value\" and then call $model->save(), you will get the same result in the end.
+
+Here is an example:
+
+	$phone->name = \"new name!\";
+	$phone->save();
+
+Here is the update method:
+
+	abstract class ActiveRecordModel
+	...
+	 /**
+     * Update the current row with new values
+     *
+     * @param array $values
+     * @return bool
+     * @throws ErrorException
+     * @throws BadMethodCallException
+     */
+    public function update(array $values)
+    {
+        if( ! isset($this->attributes[$this->id_name]))
+            throw new BadMethodCallException(\"Cannot call update on an object non already fetched\");
+
+        $connection = $this->getConnection();
+        $statement = $this->prepareStatement($connection, $values, \"update\");
+        foreach($values as $key => $value)
+        {
+            $statement->bindValue(\":{$key}\", $value);
+        }
+        $statement->bindValue(\":{$this->id_name}\", $this->attributes[$this->id_name]);
+        $success = $statement->execute();
+
+        // update the current values
+        foreach($values as $key => $value)
+        {
+            $this->setAttribute($key, $value);
+        }
+
+        if(! $success)
+            throw new ErrorException;
+
+        return true;
+    }
+	
+As you can see the update method create a new update statement from the given $attributes(check the code before), then run the statement and update the data in his **$attributes** array.
+
+<h3>Find and update</h3>
+You can also use the find method or where method to get a class corresponding to a given id or a list of classes corrisponding to a certain condition. 
+Here is an example:
+
+	$same_phone = $phone->find(77);
+
+We find a phone with an id equal to 77.
+
+The code of the ActiveRecordModel is that:
+
+	abstract class ActiveRecordModel
+	...
+	 /**
+     * Find a row given the id
+     *
+     * @param $id
+     * @return null|Mixed
+     */
+    public function find($id)
+    {
+        $conn = $this->getConnection();
+        $query = $conn->query(\"SELECT * FROM {$this->table_name} WHERE  {$this->id_name}= \" . $conn->quote($id));
+        $obj = $query->fetch(PDO::FETCH_ASSOC);
+
+        return ($obj) ? $this->newInstance($obj) : null;
+    }
+
+In case you want a where condition you can do like that:
+
+	$phone = $phone->where(\"company='nekia'\");
+	
+you can see the code below:
+	
+	abstract class ActiveRecordModel
+	....
+    /**
+     * Find rows given a where condition
+     *
+     * @param $where_cond
+     * @return null|PDOStatement
+     */
+    public function where($where_cond)
+    {
+        $conn = $this->getConnection();
+        $query = $conn->query(\"SELECT * FROM {$this->table_name} WHERE {$where_cond}\");
+        $objs = $query->fetchAll(PDO::FETCH_ASSOC);
+        // the model instantiated
+        $models = array();
+
+        if(! empty($objs))
+        {
+            foreach($objs as $obj)
+            {
+                $models[] = $this->newInstance($obj);
+            }
+        }
+
+        return $models;
+    }
+
+As you saw in this examples the basic concept of ActiveRecord is to make a one-to-one relationshib between the instance of the class and the row in the database, we also map the attributes of the table in the database with the **attributes** property of the model and we use them as data for the queries. Note that because this example is really simple we build query \"on the fly\" with the help of php PDO class, but you can create a query class that handles the creation of the query and inject him in the ActiveRecordModel class.
+
+If you are interested you can **[<span class=\"glyphicon glyphicon-download\"></span> download the code here](/code/ActiveRecordModel.zip)**.
+
+<h3>Architectural stuff</h3>
+To dig deeper into some architectural approach, this pattern is really simple to use and understand. However its simpliciy lacks flexibility, in fact when you handle one table at time this approach is fine but when you need to handle some classess nested within others, or some more complex **Object model** you will have a lot of problems with that pattern; in this situation you should use the **Data Mapper** pattern. Handling relationships aswell it's not that simple: there are some approaches to handle that based on returning new classes that rappresent the relation in the database, but its much harder to set that up with this pattern than with the Data Mapper one. In fact the biggest problem with the ActiveRecord is the high coupling (created by inheritance) between the classes in the Object model and the classes that handle the access to the data which makes handling of complicated tasks much harder; that's not happening with the Data Mapper because you istantiate a new class the handles the mapping of the data instead of inheriting from another class.
+
+That's it for today folks. If you have any question please fill a comment below. Enjoy!
+
+If you liked this article: <a href=\"https://twitter.com/JacopoBeschi\" class=\"twitter-follow-button\" data-show-count=\"false\" data-lang=\"en\">Follow me</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\"//platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>","design pattern"
+"SOLID Design principles and Php: Single responsability","solid-design-principles-single-responsability","Hello guys, this is the first article (of 5) About **SOLID** design principles. Solid design principles was written by **Uncle Bob Martin** with the objective to help building quality code. 
+But how can you say that you have written good code? You could say: when the code works its good code, but in fact that's not; in fact the biggest quality of software are that it's easy to **replicate** and easy to **modify**. <!-- more -->
+When you have fear to change a certain in code (because something may break) than that's bad code; code should be **easy** to modify!
+All thoose principles are based on making code less coupled as possible to allow easy modification and can be summarized in one single phrase: \"Program the interface!\". 
+As i first approached SOLID principles they was looking a bit complicated and overwhelming, but after i understood them they changed the way i make software in a better way. If you are a developer in my opinion you should know thoose principles: belive me or not they will change your life! 
+Let's talk about **Single responsability**. 
+The principle of single responsability says: **\"A class should have one and only one reason to change\"**. So when you build a class you should ask yourself: shall this class do that? Or should this class change in order to modify this beaviour? Let's dig into that with an example. 
+A commom approach of programmer that use MVC pattern is that they tend to put all the business logic in the controller and the data acces into the model. The role of the controller is **not** to hold the application logic but instead to catch the http request data and to respond with some other data, the controller should be **totally ignorant** about what we do with the data. Here is a classical example(Using Laravel) that doest not respect Single responsability principle:
+
+  	class PhotoController
+  	{
+		public function postPhoto()
+		{	
+			// check authentication
+			if(Auth::guest())
+				return Redirect::to('/login);
+				
+			// get the data
+			$input = Input::all();
+			
+			// validate data
+			$validator = new Validator(array(\"name\"=>\"required\", \"description\" => \"required\"));
+			if( ! $validator->make($input))
+				return Redirect::to('/photo')->withErrors($validator->getMessage());
+			
+			// save data into db
+			$this->savePhoto($input);
+			
+			return Redirect::to('/photo')->with(array(\"message\" => \"you have succesfully created a new photo\";)
+		}
+		
+		protected function savePhoto(array $input)
+		{
+			DB::table('photo')->insert(array(\"name\" => $input[\"name\"], \"description\" => $input[\"description\"]);
+		}
+	}
+	
+Now look at the code and answer to thoose questions: shall the controller save the data? Shall the controller check for authentication? Shall the controller need to be changed if we change the authentication method? The answer to all this question is the same: **NO**.
+
+The controller should only get the input, and answer with some output but not process the data. Anyways you could tell me: hey bud, this code works why should i change it? Why is not good code? The answer is: decoupling! Coupled code is one of the first problems with programming: coupled code is evil and will cause you a lot of trouble, plus this code is hard to test because all the functionality are putted all together. 
+So how can you decouple the code? Well, you should split the responsabilities and put every of them in a separate class. For example we should start by creating a repository to handle the part of saving the data. We should add a filter to that route so that we don't check for authentication inside the controller method. And about validation we should create a custom validation class to inject in the constructor of the controller. Look now at the code below:
+
+	class PhotoController
+  	{
+		protected $repo;
+		protected $v;
+	
+		public function __construct(Validator $v, Repository $r)
+		{
+			$this->repo = $r;
+			$this->v = $v;
+			$this->beforeFilter('auth', array('on' => 'photo'));
+		}
+	
+		public function postPhoto()
+		{					
+			// get the data
+			$input = Input::all();
+			
+			// validate data
+			if( ! $this->v->validate($input))
+				return Redirect::to('/photo')->withErrors($validator->getMessage());
+			
+			// save data into db
+			$this->repo->create($input);
+			
+			return Redirect::to('/photo')->with(array(\"message\" => \"you have succesfully created a new photo\";)
+		}
+	}
+	
+This looks much better but we could do something more, what we can do is make a service class to handle the creation of a new photo:
+
+	interface FormServiceInterface
+	{
+		/**
+		* @throws ValidationExeption
+		*/
+		public function processData();
+		public function getErrors();
+	}
+
+	Class PhotoCreatorService implements FormServiceInterface
+	{
+			protected $v;
+			protected $input;
+			protected $errors;
+			
+			public function __construct(Validator $v, $input)
+			{
+				$this->v = $v;
+				$this->input = $input;
+			}
+			
+			public function processData()
+			{
+				// validate data
+				if( ! $this->v->validate($input))
+				{
+					$this->errors = $v->getMessage();
+					throw new ValidationException();
+				}	
+				// save data into db
+				$this->repo->create($input);
+			}
+			
+			public function getErrors()
+			{
+				return $this->errors;
+			}
+	}
+	
+What we do here is to validate the data, if something goes wrong we throw an Exception and set the error otherwise we just save the data.
+Now how the controller will look like? Let's see:
+
+	class PhotoController
+  	{
+		protected $repo;
+		protected $v;
+		protected $photo_service;
+		
+		public function __construct(Validator $v, Repository $r)
+		{
+			$this->repo = $r;
+			$this->v = $v;
+			$this->photo_service = new PhotoService($this->v, $this->r);
+			$this->beforeFilter('auth', array('on' => 'photo'));
+		}
+	
+		public function postPhoto()
+		{					
+			// get the data
+			$input = Input::all();
+			
+			try
+			{
+				$this->photo_service->processData($input);
+			}
+			catch(ErrorException $e)
+			{
+				$errors = $this->photo_service->getErrors();
+				return Redirect::to('/photo')->withErrors($errors);
+			}
+			
+			return Redirect::to('/photo')->with(array(\"message\" => \"you have succesfully created a new photo\";)
+		}
+	}
+	
+The controller code now is much more cleaner, what we do in fact is that: we try to process the data, if something goes wrong we return an error message, otherwise we return a success message. The role of the controller now is only to get the input and respond with some data, the controller is totally ignorant about what we do with the data! The service will just handle processing the data with the help of the validators and of the repository. The code now is much more decoupled, easier to test and to extend and we have respected **Single Responsability principle**.
+
+That's it folks, stay tuned for new articles!
+
+If you liked this article: <a href=\"https://twitter.com/JacopoBeschi\" class=\"twitter-follow-button\" data-show-count=\"false\" data-lang=\"en\">Follow me</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=\"//platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");</script>
+","design pattern,laravel,solid"
+"SOLID Design principles and Php: Open closed","solid-design-principles-and-php-open-closed","In this article we talk about the O in SOLID principles: **Open closed**. The Open closed principle says that: a class should be open for extension but closed for modification, what that means? Well, in practise when you make a class you could expand it for adding new features but not modify it for changing his beahvior, instead you should separate the extensible behavior behind an interface and flip the dependencies. What that means? I'll drive into that with an example. Let's say we are writing a business application to handle building information in a certain country. Let's create a class to handle small apartments:
+
+<!-- more -->
+		
+	Class SmallAparment extends Appartment
+	{
+		protected $area;
+		protected $zip;
+		protected $address;
+		protected $base_coefficent = 1.22;
+
+		public function __construct($area, $zip, $address)
+		{
+			$this->area = $area;
+			$this->zip = $zip;
+			$this->address = $address
+		}
+		
+		public function getArea()
+		{
+			return $this->area;
+		}
+	}
+	
+Now imagine that we want to calculate taxes for small appartments, to do that we  create the \"AppartmentTaxCalculator\" class.
+
+	class AppartmentTaxCalculator
+	{	
+		public function calculateTax(array $apartments)
+		{
+			$total = 0;
+			foreach($appartments as $appartment)
+			{
+				$total+= $apartment->getArea() * $appartment->base_coefficent;
+		    }
+			
+			return $total;
+		}
+	}
+	
+Allright, for now everything looks fine: we calculate the tax for each appartment and sum up all the taxes. Now imagine we want to calculate the tax of medium apartment aswell, in that case the formula would be **area * base_coefficent + 10**. How we could do that? Well, we can say: let's add and if statement and check for the istance of the class depending on that we do the calculation; how many time we used that solution? The code will look like this:
+
+	class AppartmentTaxCalculator
+	{	
+		public function calculateTax(array $apartments)
+		{
+			$total = 0;
+			foreach($appartments as $appartment)
+			{
+				if(is_a($apartment, 'SmallApartment'))
+					$total += $apartment->getArea() * $apartment->base_coefficent;
+				else
+					// here we are breaking open closed principle!!!
+					$total += $apartment->getArea() * $apartment->base_coefficent + 10;
+	       }
+		   
+		   return $total;
+		}
+	}
+	
+But doing like that we **BREAKED** the Open closed principle! At the state of the code right now maybie it's not a big deal, but imagine what will happen if we start to use 10 or more type of appartment classes: that if will become a **Big IF**, the code will start to get complicated and hard to handle.
+But fortunatelly there is a way to fix that, what Uncle Bob said was: \" you should separate the extensible behavior behind an interface and flip the dependencies\". Here is how we can do that following the Open closed principle: we need to find the extensible behavior, in that case is the function \"calculateTax\", create and interface for that and swap the dependencies. Let's start by creating the interface:
+	
+	interface TaxCalculate
+	{
+		/**
+		* Calculate a tax for a single appartment
+		* @param Appartment
+		* @return Integer
+		*/
+		public function calculateTax();
+	}
+	
+Now we need to implement the interface in every type of Appartment Class, here is for example with the MediumAppartment:
+
+	Class MediumAparment extends Appartment implements TaxCalculate
+	{
+		protected $area;
+		protected $zip;
+		protected $address;
+		protected $base_coefficent = 1.22;
+		
+		public function __construct($area, $zip, $address)
+		{
+			$this->area = $area;
+			$this->zip = $zip;
+			$this->address = $address
+		}
+		
+		public function getArea()
+		{
+			return $this->area;
+		}
+		
+		public function calculateTax()
+		{
+				return $this->area * $this->base_coefficent + 10; 
+		}
+	}
+
+And finally here is our **ApartmentTaxCalculator** class:
+
+	class AppartmentTaxCalculator
+	{	
+		public function calculateTax(array $apartments)
+		{
+			$total = 0;
+			foreach($appartments as $appartment)
+			{
+				$total+=$appartment->calculateTax();
+	       }
+		   return $total;
+		}
+	}
+	
+Now we can add as many apartment classes we want, the calculator will do the same: the code is open for extension and closed for modification! Once again what we  was **Program the interface**. I will never stress that enough how much important is to use interfaces in your code!
+
+That's it for today! Happy coding!","design pattern,solid"
+"SOLID Design principles and Php: Liskov substitution","solid-design-principles-and-php-liskov-substitution","Hello everybody, today we talk about the third letter (L) of **SOLID** principles: Liskov substitution. This principle has a mathematical definition pretty hard to understand, but in practise it says: every time you create a subclass of a superclass that subclass should be substitutable in every place where the original class took place. Let's dig in with an example. Imagine we create a player class. 
+    <!-- more -->
+	Class player
+	{
+		public function play($file)
+		{
+			// play the file...
+		}
+		
+	}
+	
+	Class mp3player
+	{
+		public function play($file)
+		{
+			if(pathinfo($file, PATHINFO_EXTENSION) != \"mp3\")
+				throw new InvalidArgumentException; // here we violate LSP
+		
+			// play the file...
+		}
+	}
+
+What we do here in our concrete player is to check for the extension and throw an exception if the file extension is not correct; that **violates** the Liskov substutution principle! In fact here we had a greater precondition than we defined in the superclass. This code cannot be substituted with the original one  because we may throw an exception; in the old implementation we didn't know about that exception so we didn't handle that, this will land in corrupted code break!
+Let's do another example, imagine we create a suite of classes to fetch images:
+
+	interface FetchImageInterface
+	{
+		/**
+		 * Fetches images from directory
+		 * @param String $directory
+		 * @return array $images
+		 */
+		public function fetch($directory);
+	}
+
+Now we create an implementation: jpgfetcher.
+
+	class JpegFetcher implements FetcherImageInterface
+	{
+	/**
+	* {@inheritdoc}
+	*/
+	public function fetch($directory)
+	{
+			$images = [];
+
+			if ($handle = opendir($directory)) {
+			   /* Questa è la maniera corretta di eseguire un loop all'interno di una directory. */
+			   while (false !== ($file = readdir($handle))) { 
+				  $images[] = $file;
+			   }
+			
+			   closedir($handle); 
+		   }	
+			
+			return (count($images) > 1) ? $images : $images[0]; // here we violate LSP
+		}
+	}
+
+The problem here is that we check for the lenght of the data and we return an array or an item depending on it's size, but the client class expects an array not an item! That will create code breakage and violates LSP again! So to conclude this short article the interface is a contract, respect the contract and program the interface, if you follow that you will not violate LSP principle! Keep in mind php is not a strong typed language so you can't force implementation return value, but you can put the expected return values in the comment (as the example above **FetcherImageInterface**).
+Stay tuned for the followup: **Interface Segregation**!
+	
+
+
+","design pattern,solid"
+"Laravel setup alias and service provider in a package","laravel-setup-alias-and-service-provider-in-a-package","Hello folks. This article is just a **brief** explanation on how you can create new run-time alias and load service provider within your laravel package.
+If you want to load other service provider from the package you have to use this command inside the register method if your **service provider**:
+<!-- more -->
+
+
+	public function register()
+	{
+			....
+			// load custom service providers
+	        $this->app->register('Service\\Provider\\Path');
+	}
+
+If you want to load custom aliases you have to use this command inside the register method if your **service provider**:
+
+
+	public function register()
+	{
+		....
+		// register aliases
+        AliasLoader::getInstance()->alias(\"Alias\",'Full\\Class\\Path');
+	}
+	
+I told you this is a **brief** article  :-) . That's it for today! Happy coding!","laravel"
+"SOLID Design principles and Php: Interface Segregation","solid-design-principles-and-php-interface-segregation","Ok guys we're almost done with the SOLID principles series, today we talk about the interface segregation principle. The **Interface segregation** principle says: \"A client should not be forced to implement and interface that doesn't use\". As we are used let's explain that with an example. Imagine we are using the [repository pattern](http://martinfowler.com/eaaCatalog/repository.html) to save some objects. 
+<!-- more -->
+
+
+The repository will implement a RepositoryInterface:
+
+	<?php 
+	/**
+ 	*	 Interface BaseRepositoryInterface
+ 	*
+ 	*/
+	interface BaseRepositoryInterface 
+	{
+    	/**
+     	* Create a new object
+     	* @return mixed
+     	*/
+    	public function create(array $data);
+
+	  /**
+	   * Update a new object
+	   * @param id
+	   * @param array $data
+	   * @return mixed
+	   */
+	  public function update($id, array $data);
+  
+	  /**
+	   * Deletes a new object
+	   * @param $id
+	   * @return mixed
+	   */
+	  public function delete($id);
+  
+	  /**
+	   * Find a model by his id
+	   * @param $id
+	   * @return mixed
+	   */
+	  public function find($id);
+  
+	  /**
+	   * Obtains all models
+	   * @return mixed
+	   */
+	  public function all();
+	}
+	
+Let's now create an **Eloquent** implementation of that:
+
+	<?php 
+	 /**
+    * Class EloquentBaseRepository
+    *
+	*/
+	  
+	 use BaseRepositoryInterface;
+	 use Event;
+
+	class EloquentBaseRepository implements BaseRepositoryInterface
+	{
+	  /**
+	   * The name of the model: needs to be eloquent model
+	   * @var String
+	   */
+	  protected $model_name;
+  
+	  public function __construct($model_name = null)
+	  {
+		  if($model_name) $this->model_name = $model_name;
+	  }
+  
+	  /**
+	   * Create a new object
+	   *
+	   * @return mixed
+	   */
+	  public function create(array $data)
+	  {
+		  $model = $this->model_name;
+		  return $model::create($data);
+	  }
+  
+	  /**
+	   * Update a new object
+	   * @param       id
+	   * @param array $data
+	   * @return mixed
+	   * @throws \\Illuminate\\Database\\Eloquent\\ModelNotFoundException
+	   */
+	  public function update($id, array $data)
+	  {
+		  $obj = $this->find($id);
+		  Event::fire('repository.updating', [$obj]);
+		  $obj->update($data);
+		  return $obj;
+	  }
+  
+	  /**
+	   * Deletes a new object
+	   * @param $id
+	   * @return mixed
+	   * @throws \\Illuminate\\Database\\Eloquent\\ModelNotFoundException
+	   */
+	  public function delete($id)
+	  {
+		  $obj = $this->find($id);
+		  Event::fire('repository.deleting', [$obj]);
+		  return $obj->delete();
+	  }
+  
+	  /**
+	   * Find a model by his id
+	   * @param $id
+	   * @return mixed
+	   * @throws \\Illuminate\\Database\\Eloquent\\ModelNotFoundException
+	   */
+	  public function find($id)
+	  {
+		  $model = $this->model_name;
+		  return $model::findOrFail($id);
+	  }
+  
+	  /**
+	   * Obtains all models
+	   * @return mixed
+	   */
+	  public function all()
+	  {
+		  $model = $this->model_name;
+		  return $model::all();
+	  }
+	}	 
+	
+Perfect, for now everything looks great. But what now imagine we need to save producs, and they need to be saved in different languages. What we could do is just extend The **EloquentBaseRepository** Class and add some more methods to the **BaseRepositoryInterface**. But by doing that we will violate the **Interface Segregation** principle. I'll show you why, take a look and the new interface:
+
+	interface BaseRepositoryInterface 
+	{
+	....
+		/*
+		* @param $slug_lang the variable used to identify a class by his language
+		*/
+	    public function findBySlugLang($slug_lang);
+		
+Now the EloquentBaseRepository need to implement that method, but actually... it doesn't need that, the method is needed only for the ProductRepository which needs to be saved in different languages. 
+So what we need to do is: create another interface and implement that only in the **ProductRepository**, so let's create a **MultilanguageRepositoryInterface**:
+
+	interface MultilanguageRepositoryInterface
+	{
+        /*
+        * @param $slug_lang the variable used to identify a class by his language
+        */
+        public function findBySlugLang($slug_lang);
+	}
+	
+And then what we will do in the ProductRepository is to implement both the interfaces and extends the **EloquentBaseRepository**:
+
+	Class PropuctRepository extends EloquentBaseRepository implements MultilanguageRepositoryInterface, BaseRepositoryInterface
+	{
+		public function findBySlugLang($slug_lang)
+		{
+			// code goes here
+		}
+	}
+	
+Prefect, now we are respecting the SOLID design principles. And as you can see they are all based on reparating the part of the code to get less coupling and easyer ways to swap implementations! 
+
+That's it for today guys. Enjoy!","design pattern,laravel,solid"
+"SOLID Design principles and Php: Dependency inversion","solid-design-principles-and-php-dependency-inversion","This is the last article about the SOLID principles series. In this article we talk about the D in SOLID: \"**Dependency inversion**\".  This last part may be the harder to understand for you guys. Before saying the principle we need to explain some definitions:
+- **High level code**:  the code that is focused on solving a general problem (For example db access)
+- **Low level code**:  the code focused on solving a particular problem. 
+<!-- more -->
+Keep this definition as it is for now, the Dependency inversion principle says: Every implementation of high level code should not depend on the implementation of low level code, instead should depend on an interface. Again as you see all the principles gets into the \"Program the interface\" principle. This principle is based on reducing coupling between the code, allowing easier testing and mantainance of the code itself. Now let's dig in with an example: 
+Imagine we are handling a subscription form and at one point we need to send an email to the client. 
+
+	use Mail;
+  	Class UserSubscriptionService
+  	{
+		public function subscribe($user)
+		{
+			// do something...
+			// send email to the user mail
+			$this->sendMail($user->email);
+		}
+		
+		protected function sendMail($email)
+		{
+			Mail::queue($template, [\"body\" => $body], function($message) use($to, $subject){
+					$message->to($email)->subject($subject);
+				});
+		}
+  	}
+As you can see we use Mail to send email, the problem here is that we violate the dependency inversion principle, in fact the High level code(**UserSubscriptionService**) depends on the low level code (**Mail**). What we need to do here to solve the problem is to create an interface and let the Class use that interface instead of the class itself. Let's create the interface:
+
+	interface MailerInterface
+	{
+	  /**
+	   * Interface to send emails
+	   *
+	   * @param $to
+	   * @param $body
+	   * @param $subject
+	   * @param $template
+	   * @return boolean $success
+	   */
+	  public function sendTo($to, $body, $subject, $template);
+	}
+	
+Allright, now we create the mailer implementation of that:
+	  
+	  class SwiftMailer implements MailerInterface {
+		/**
+		 * {@inheritdoc}
+		 */
+		public function sendTo($to, $body, $subject, $template)
+		{
+			try
+			{
+				Mail::queue($template, [\"body\" => $body], function($message) use($to, $subject){
+					$message->to($to)->subject($subject);
+				});
+			}
+			catch( \\Swift_TransportException $e)
+			{
+				Log::error('Cannot send the email: '.$e->getMessage());
+				return false;
+			}
+			catch( \\Swift_RfcComplianceException $e)
+			{
+				Log::error('Cannot send the email: '.$e->getMessage());
+				return false;
+			}
+	
+			return true;
+		}
+	  }
+	
+Perfect, now the last part is to user make the dependency of the interface instead on the service class:
+	
+	Class UserSubscriptionService
+  	{
+		//.....
+		
+		protected function sendMail($email, MailerInterface $mailer)
+		{
+			$mailer->sendTo($obj->email, [ \"body\" => \"body\" ], \"Subject...\");	
+		}
+  	}
+	
+Perfect, now we need to pass either the SwitfMailer implementation to sendMail or we can also use laravel IOC container and instead put this code in app/start/global.php (or if you prefer put it in a ServiceProvider):
+
+	App::bind('MailerInterface', function(){return new SwiftMailer()});
+	
+By doing that we bind the interface to the implementation, why do that? Well, imagine that we send email form many part of our application and at one point we want to use a different library; by doing that you dont have to change every line of code where you send emails but instead you can just swap one line of code. Isn't it brilliant? Any comments? Fill the form below. We are done for today.
+Thanks for reading folks!","design pattern,laravel,solid"
+"How to import and export data gracefully with php and laravel","how-to-import-and-export-data-gracefully-with-php-and-laravel","Hello guys, during my career i've come across the problem of **importing** and **exporting** data from and to different formats many multiple times. For this reason i want to share with you my general approach to solve this problem. 
+The process of importing and exporting data mainly is just a process of data trasforming; for this reason the import and export operations can be seen as the same of **data transformation**.
+<!-- more -->
+After realising that i started to think a smart way to solve the problem gracefully. What i decided to do is to separate the process in three parts:
+
+1. Reading data from a format 
+2. Trasforming data into a general format
+3. Saving data into another format
+
+So every kind of import/export operation can be splitted in thoose 3 parts. At this point i decided to create two interface, one for reading data and one for saving data (keep this code mainly as a proof of concept). The interface for reading the data will be this:
+
+	interface Reader 
+	{
+    /**
+     * Open stream from a source
+     *      A source can be anything: for instance a db, a file, or a socket
+     * @param $source
+     * @return void
+     * @throws \\Palmabit\\Library\\Exceptions\\CannotOpenFileException
+     */
+    public function open($source);
+
+    /**
+     * Reads a single element from the source
+     *    then return a Object instance
+     * @return \\StdClass object instance
+     */
+    public function readElement();
+
+    /**
+     * Read all the objects from the source
+     * @return \\ArrayIterator
+     */
+    public function readElements();
+
+    /**
+     * Obtains all the objects readed as StdClass
+     * reflecting an imperative mapping of key => value
+     * @return \\ArrayIterator
+     */
+    public function getObjects();
+
+    /**
+     * Obtains all the objects readed as Istantiated Class
+     * @return \\ArrayIterator
+     */
+    public function getObjectsIstantiated();
+
+    /**
+     * Obtains the class name of the objects to istantiate
+     * @return mixed
+     */
+    public function getIstantiatedObjectsClassName();
+
+    /**
+     * Set the StdClass objects
+     * @param array $objects
+     * @return mixed
+     */
+    public function setObjects(array $objects);
+
+    /**
+     * Creates the actual real instance of the required objects
+     * @return \\ArrayIterator
+     */
+    public function IstantiateObjects();
+	}
+	
+The concept in this interface is that with a reader implementation you can **open** a certain source of data, then **read** an arbitrary amount of data, and then transform that data to a general object. In this interface i've merged the responsability to read data with the one of trasforming data (point 1 and 2 above). That's not the best (break single responsability principle), in fact what you can do is split the responsability between two interfaces instead; you could try that as an your own. 
+Now comes the last part: the save of the data. This will be handled with the Saver interface:
+
+	use ArrayIterator;
+
+	interface Saver
+	{
+    /**
+     * Handle saving the array of data
+     * @param \\ArrayIterator $objects
+     * @return mixed
+     */
+    public function save(ArrayIterator $objects);
+	}	 
+	
+This interface is pretty simple and handles the save of the data. What i did then was to try to generalize some part of the process, in fact the part that transform data in a general object should be reused in most of the implementation; for this reason i've created the Reader class:
+
+	use InvalidArgumentException;
+	use Palmabit\\Library\\ImportExport\\Interfaces\\Reader as ReaderInterface;
+	use ArrayIterator, Exception;
+
+	abstract class Reader implements ReaderInterface
+	{
+	  /**
+	   * The objects as StdClass
+	   * @var \\ArrayIterator
+	   */
+	  protected $objects;
+	  /**
+	   * Objects as real usable class
+	   * @var \\ArrayIterator
+	   */
+	  protected $objects_istantiated;
+	  /**
+	   * @var String
+	   */
+	  protected $istantiated_objects_class_name;
+  
+	  /**
+	   * @return \\ArrayIterator
+	   */
+	  public function getObjects()
+	  {
+		  return $this->objects;
+	  }
+  
+	  /**
+	   * @return \\ArrayIterator
+	   */
+	  public function getObjectsIstantiated()
+	  {
+		  return $this->objects_istantiated;
+	  }
+  
+	  /**
+	   * Assuming that we can pass all the proprieties to that object as an array
+	   * we istantiate each of that StdClass as a IstantiatedObject
+	   * @return \\ArrayIterator
+	   * @throws \\Exception
+	   */
+	  public function istantiateObjects()
+	  {
+		  $this->validateObjectClassName();
+  
+		  $objects_iterator = new ArrayIterator;
+  
+		  $this->appendObjectDataToIterator($objects_iterator);
+  
+		  $this->objects_istantiated = $objects_iterator;
+		  return $this->objects_istantiated;
+	  }
+  
+	  private function validateObjectClassName()
+	  {
+		  if (!$this->istantiated_objects_class_name) throw new Exception(\"You need to set istantiated_object_class_name\");
+  
+		  if (!class_exists($this->istantiated_objects_class_name)) throw new InvalidArgumentException(\"The class name to istantiate given is not valid.\");
+	  }
+  
+	  /**
+	   * @param $objects_iterator
+	   */
+	  private function appendObjectDataToIterator($objects_iterator)
+	  {
+		  if ($this->objects) foreach ($this->objects as $object) {
+			  $data_array = $this->transformObjectDataToArray($object);
+			  $object = $this->istantiateObjectClass($data_array);
+  
+			  $objects_iterator->append($object);
+		  }
+	  }
+  
+	  /**
+	   * @return String
+	   */
+	  public function getIstantiatedObjectsClassName()
+	  {
+		  return $this->istantiated_objects_class_name;
+	  }
+  
+	  /**
+	   * @param array $objects
+	   */
+	  public function setObjects(array $objects)
+	  {
+		  $this->objects = $objects;
+	  }
+  
+	  /**
+	   * @param $object
+	   * @return array
+	   */
+	  private function transformObjectDataToArray($object)
+	  {
+		  $data_array = get_object_vars($object);
+  
+		  return $data_array;
+	  }
+  
+	  /**
+	   * @param $data_array
+	   * @return mixed
+	   */
+	  private function istantiateObjectClass($data_array)
+	  {
+		  $object = new $this->istantiated_objects_class_name($data_array);
+  
+		  return $object;
+	  }
+	}
+
+As you can see this class is abstract, in fact it sould not be istantiated on his own. What the saver class is doing in fact is to create a new ArrayIterator, then create various instance of **istantiated_objects_class_name**, fill them with the data readed and append them to this iterator. This is the process of **trasforming the data**. At this point the last part that we need to do is just to actually create an implementation of reader and saver classes. In this example i've created a csvFileReader and an eloquentDbSaver. Here is the source of the csvFileReader:
+
+	use ArrayIterator;
+	use Palmabit\\Library\\ImportExport\\Reader;
+	use SplFileObject;
+
+	class CsvFileReader extends Reader
+	{
+	  /**
+	   * @var \\SplFileObject
+	   */
+	  protected $spl_file_object;
+	  /**re
+	   * @var string
+	   */
+	  protected $delimiter = \",\";
+	  /**
+	   * @var Array
+	   */
+	  protected $columns_name;
+  
+	  /**
+	   * Open stream from a source
+	   *      A source can be anything: for instance a db, a file, or a socket
+	   *
+	   * @param String $path
+	   * @return void
+	   * @throws \\Palmabit\\Library\\Exceptions\\CannotOpenFileException
+	   */
+	  public function open($path)
+	  {
+		  $this->spl_file_object = new SplFileObject($path);
+		  $this->spl_file_object->setCsvControl($this->delimiter);
+		  $this->columns_name = $this->spl_file_object->fgetcsv();
+  
+	  }
+  
+	  /**
+	   * Reads a single element from the source
+	   *    then return a Object instance
+	   *
+	   * @return \\StdClass|false object instance
+	   */
+	  public function readElement()
+	  {
+		  $csv_line_data = $this->spl_file_object->fgetcsv();
+		  if($csv_line_data)
+		  {
+			  $csv_line = array_combine($this->columns_name, $csv_line_data);
+			  // we cast it to StdClass
+			  return (object)$csv_line;
+		  }
+		  else
+		  {
+			  return false;
+		  }
+	  }
+  
+	  /**
+	   * Read all the objects from the source
+	   *
+	   * @return \\ArrayIterator
+	   */
+	  public function readElements()
+	  {
+		  $iterator = new ArrayIterator;
+		  do
+		  {
+			  $object = $this->readElement();
+			  if($object) $iterator->append($object);
+		  }while((boolean)$object);
+  
+		  $this->objects = $iterator;
+		  return $this->objects;
+	  }
+  
+	  /**
+	   * @param string $delimiter
+	   */
+	  public function setDelimiter($delimiter)
+	  {
+		  $this->delimiter = $delimiter;
+	  }
+  
+	  /**
+	   * @return string
+	   */
+	  public function getDelimiter()
+	  {
+		  return $this->delimiter;
+	  }
+	}
+	
+That class actually implements the resting methods from the Reader interface, and uses SplFileObject to read data from a Csv file. There is one thing missing: we didn't set the **$istantiated_objects_class_name** variable, we should write the name of the class we want to instantiate, here is an example(UserCsvFileReader):
+
+	class UserCsvFileReader extends CsvFileReader
+	{
+   		protected $istantiated_objects_class_name = '\\Palmabit\\Authentication\\Models\\UserDbImportSaver';
+	}
+	
+The saver class is this:
+
+	use ArrayIterator;
+	use Palmabit\\Library\\ImportExport\\Interfaces\\Saver;
+
+	class EloquentDbSaver implements Saver
+	{
+	  public function save(ArrayIterator $objects)
+	  {
+		  foreach ($objects as $object)
+		  {
+			  if( ! $object->save()) return false;
+		  }
+  
+		  return true;
+	  }
+	} 
+	
+What it actually does is just to call save on all the object classes, in fact eloquent has already his way to save data of an Eloquent class. Well, you could say: how we know this is an eloquent class? In fact we don't know that but we expect that as it's an EloquentDbSaver. With other implementatios we would do some different operation to save the data. 
+What you could say is: hey we just read data from a csv and save that into a db, why you doing all that interfaces and abstract classes? Well the advantage is this: now we can create as many implementation of reading and saving data with any format we want; for example we can create an EloquentDbReader, a csvFileSaver or a JsonFileSaver and so on. This code was written in TDD but for this purpose i didn't show the test of each class, but if you are interested you can download the full sources (with the tests) [<i class=\"fa fa-download\"></i> here](http://www.jacopobeschi.com/code/import_export_jb.zip).
+
+I hope you enjoy the article. 
+Happy coding!","laravel"
+"How to effectively use composer artifacts","how-to-effectively-use-composer-artifacts","Hello guys, some days ago i had to setup a private composer repository without using a VCS. After reading the original documentation i encountered some issues. 
+For this reason i decided to make a post on my website that explains better the overall process.
+<!-- more -->
+The first thing you need to do is to setup a version of your composer package, so open the composer.json file and add the tag: \"**version: version_number**\". 
+After that you need to zip the whole package directory: the zip file should contain only the file of your composer package, excluding the vendor name and the package directories. <br/>
+For example let's assume you have a package in \"**workbench/vendor/package_name**\" what you have to do is to create a zip file named **vendor-package_name-version.zip** that contains all the files inside the **package_name** folder (excluding the folder itself).
+At this point you have to create a directory in the same folder of your composer.json application file, in this example i call it \"**artifacts**. In that directory you put your package.zip file. Now in your main composer.json you have to add the following lines:
+
+	\"repositories\": [
+        {
+            \"type\": \"artifact\",
+            \"url\": \"artifacts/\"
+        }
+    ],
+	
+And then add the dependency on your require field:
+
+	\"require\": {
+        \"vendor/package_name\": \"version\"
+    }
+	
+At this point all you have to do is run **composer update** and you'll be done. Have a nice day!<br/>
+If you have any doubts don't hesitate to write a comment below: i'll be happy to answer any of your questions!
+","management"
+"4 simple rules for better writing method and variables","4-simple-rules-for-better-writing-method-and-variables","Programming is an art and programmers are artists. As any artist anyone has a different approach for crafting, besides that there are some common rules that would help you writing better software. In fact is really important to write software not just that \"works\" but also that is easy to read and unterstand. In fact Brian Kerninghan (C creator) has written: <br/>
+<!-- more -->
+\"*Good programming is not learned from generalities, but by seeing how significant programs can be made clean, easy to read, easy to maintain and modify, human-engineered, efficient, and reliable, by the application of common sense and good programming practices. Careful study and imitation of good programs leads to better writing.*\" <br/>
+You may now say that for you writing software easy to read is not that important, but in fact you are wrong.
+<br/>
+If you read software hard to understand the next time you read that code to make some changes you will have an hard time and spend more time than intended. Writing unreadable code is even worst if you work in a team: imagine if your team partner need to edit some code you wrote days ago in a \"bad way\", how you think he would feel? How many times you to saw some rot code and said: \"what the hell is that?\" and how you think your life as programmer would be if that won't happen to you anymore? <br/>
+In fact writing understandable software is really important and i think that don't respecting this rule is **unprofessional**.  <br/>
+So now i think you agree with my opinion, but now comes the hard part: how can you write code easy to understand? The answer is not simple at all, in fact you need a lot of practise and experience to achieve that goal. But the title of this post is: \"4 simple rules for writing method and variables\", so now we will focus on simple rules for writing better methods and variables. 
+
+When i started programming i was using few methods and my methods were really long, after a while i realized that this is not a good approach: as time pass the code will come more complex and hard to understand. <br/>
+A good way to make code more readable is to extract every set of istruction (that can be extracted) into a method; you may ask now: \"Ok i got it but when i should stop extracting?\". You should keep extracting your code until you can't extract anymore, Uncle Bob calls that method: \"Extract till you drop!\".  <br/>
+This methods works really well and make your code more more readable **only and only** if you write good method names! A method name should describe fully his beavior, when you need to write a comment to explain what a method does you have already failed. In fact sometimes you really need to write comments, but try to be as much explanatory as you can using good methods and variable names.  
+Now comes the second quesiton: how long my method names should be? This land to two answer that are 2 of the 4 rules that i was talking:<br/>
+**1. Method names should be long when their scope is short<br/>
+2. Method names should be short when their scope is long**<br/>
+So why that? The answer is, if you have a public method used frequently outside of your class then you don't like a really long name, but if you use a method inside your class his scope is short and is really important to explain better his behavior without writing many useless comments. In fact the other problem with comments is that they get out of date really fast.<br/>
+About variable names, for them the rule is the opposite of methods:<br/>
+**
+1. Variable names should be short when they have a short scope<br/>
+2. Variable names should be long when they have a long scope<br/>
+**
+In fact variables with a short scope are easy to find so you don't need to write a super long name, instead variables with a longer scope are hard to find and the name would be better if it's more self explanatory.
+I want to share with you a really simple example of what i've said. Imagine you have a code like this:<br/>
+
+	Class example {
+	....
+	if(! $this->errors->isEmpty())
+	{
+		throw new Exception($this->errors->getMessage());
+	}
+	
+The code checks for errors and then throws a new exception if find any. But now let's extract some code into methods (if you use an ide is really fast to do that with the refactoring techniques).
+
+	Class example {
+	....
+	if(! $this->foundAnyErrors())
+	{
+		throw new Exception($this->getErrorMessages());
+	}
+	
+	protected function foundAnyErrors()
+	{
+		return $this->errors->isEmpty();
+	}
+	
+	protected function getErrorMessages()
+	{
+		return $this->errors->getMessage();
+	}
+	
+Isn't the code here more readable? You may say: \"hey, you have 3 methods now, you're code is slower!\". In fact that is true, but in 99% of the cases that little overhead is worth it for the gain in code clarity and reusability. 
+By extracting this logic to methods not only we made the code more readble but also we made id more reusable: we could use this methods anywhere in our class now!<br/>
+So here we are, we talked about code readability, functions and method naming. We're done for now, if you have any question feel free to ask me and i'll be happy to answer you!
+","design pattern,programming rules"
+"Integrate Laravel And Session in external php application","integrate-laravel-session-in-external-php-application","Hello foks, it's been a while since i didn't write an article. Today i'll explain you how you can integrate Laravel framework 4 (and his session driver) in any other php application.
+I'm writing this because i had to solve this problem in one of my works and i want to share this with you.
+<!-- more -->
+You may say, why i should do that? Well, for multiple reasons, the first one i can find is if you want to use your laravel app authentication in an external php file or application (in orded to do that you need to use the laravel app session driver).
+
+To integrate Laravel4 in another php application you need to follow 2 main steps: 
+
+1. Boot up laravel framework
+2. Start the session driver manager that i've created
+
+The first part is trivial, all you have to do is put the following code in a **.php** file and include it in your application:
+
+	<?php
+	// boot laravel
+	require __DIR__ .'/../../vendor/autoload.php';
+	$laravel_app = require __DIR__ .'/../../bootstrap/start.php';
+	$laravel_app->boot();
+
+You have to replace the require path with the correct one depending on where is located your laravel framework installation.
+Then after the bootstrap of your application put the following code: 
+	
+	// boot session
+	require __DIR__ .'/laravelManager.php';
+	$manager = new laravelSessionManager($laravel_app);
+	$manager->startSession();
+	
+This simple script will start laravel session with the help of the session manager class (LaravelManager.php) that i've created. The session manager class code is here:
+
+	<?php
+	/**
+	 * Class laravelManager
+	 *
+	 * @author jacopo beschi jacopo@jacopobeschi.com
+	 *
+	 * remember to use Session::save() to persist the data
+	 */
+	use Illuminate\\Session\\SessionManager;
+	use Illuminate\\Encryption\\Encrypter;
+
+	class laravelSessionManager
+	{
+    public $laravel;
+
+    protected $cookie_name;
+
+    protected $app_key;
+
+    public function __construct($laravel)
+    {
+        $this->laravel = $laravel;
+        $this->app_key = $this->laravel['config']['app.key'];
+        $cookie_name = $this->laravel['config']['session.cookie'];
+        $this->cookie_name = isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : false;
+    }
+
+    public function startSession()
+    {
+        $encrypter = $this->createEncrypter();
+
+        $manager = new SessionManager($this->laravel);
+        $session = $manager->driver();
+
+        $this->updateSessionId($encrypter, $session);
+
+        $session->start();
+
+        $this->bindNewSession($session);
+    }
+
+    /**
+     * @return Encrypter
+     */
+    private function createEncrypter()
+    {
+        $encrypter = new Encrypter($this->app_key);
+        return $encrypter;
+    }
+    /**
+     * @param $encrypter
+     * @param $session
+     */
+    private function updateSessionId($encrypter, $session)
+    {
+        if($this->cookie_name)
+        {
+            $sessionId = $encrypter->decrypt($this->cookie_name);
+            $session->setId($sessionId);
+        }
+    }
+
+    /**
+     * @param $session
+     */
+    private function bindNewSession($session)
+    {
+        App::instance('session', $session);
+        App::instance('session.store', $session);
+    }
+
+	}
+	
+This class basically boot up laravel session driver using your laravel configuration settings in a transparent way.<br/>
+After the **$manager->startSession();** code you can use the whole laravel framework (authenticatoin session and more) in your external php application, isn't that lovely? 
+
+Have any questions? Feel free to ask me. 
+Happy coding!
+
+","laravel"
+"Introduction to Unit testing with Laravel framework: step1","introduction-to-unit-testing-with-laravel-framework-step1","When i first came into programming i didn't even know what self tested code was and how much it's important for a developer. This article is for developers that want to start unit testing with laravel framework or php in general.
+Before going into details i'd like to explain you briefly what is unit testing and automated code tests. Automated code tests are programs that verify automatically that your application works as expected.
+Why self tested code is important? For multiple reasons, the most important is that removes the \"fear of change\" and for this reason help you refactoring your code and improving it.
+<!-- more -->
+There are various kind of automated tests:
+
+1. Acceptance test
+2. Integration test
+3. **Unit test**
+
+In this article i'll start teaching you Unit tests. Unit test are the part of automated test that test the internal part of your code, in an \"unit\" prospective.
+What that means? That means that an unit test should test only a unit/part of your code, in an object oriented language that can be associated to a single class. Allright so unit test tests a single class? What if my class need the support of other neighbors classes? What if my class touches the database?
+In fact you have two options: 
+
+1. Test you class in isolation and Mock the rest (Mockist way)
+2. Also touch external part of your unit on your tests
+
+Evey approach have his advantage and disadvantage but that's a more advanced topic.
+There are 2 main tools for unit testing in php: phpunit and phpspec. In this article i explain you phpunit because it's the most common tool used in this case.
+To start with unit test you need to [install phpunit](http://phpunit.de/getting-started.html)
+Now you need to write your first test class. So where do i put my test class?
+As laravel philosophy you could put them anywhere you want, but as my advice you should put them in a tests directory and Laravel already made this for you! Its the _app/tests/_ foder.
+So now let's create the test class:
+	
+	<?php
+	class ExampleTest extends \\PHPUnit_Framework_TestCase{
+	
+		/*
+		 * @test
+		*/
+		public function itWorks()
+		{
+			$this->assertTrue(true);
+		}
+	}
+	
+As you can see our test class extends _\\PHPUnit_Framework_TestCase_. I've created a dummy test there, as you can see the test has a docblock comment @test, this comment is needed in order to understand that this function is a test, if you prefer you could also name your method with a prefix **tests** instead. 
+In the test function i've created and assert, this code in fact just verify that true, is true; obviously this is just for te sake of showing you how to write a test. If you run phpunit you will see that your test passes. 
+Every unit test should be separated in three parts:
+1. Arrange: in this part you prepare the system for your test, for example if you need to find a record in the db you create a fake record in it.
+2. Act: we run the function that needs to be tested, in the case of the query we just run the query
+3. Assert: in this part we just verify that our action was landed succesfully, for instance we could check that the record was found.
+I'll talk you more about this in the following article.
+Before closing the day i'd like to point you one more thing: our first class is not integrating with laravel framework and for this reason we can't call any of his fancy functions. If you want to use laravel within your test class you need to extend laravel TestCase class. 
+
+	<?php 
+	class ExampleTest extends \\Illuminate\\Foundation\\Testing\\TestCase{
+	
+		/*
+		 * @test
+		*/
+		public function itWorks()
+		{
+			// here you can use laravel framework!
+			$this->assertTrue(true);
+		}
+	}
+	
+Allright, that's enough for today; in the next article i'll explain you how to setup your test, the AAA rule and we'll go with a real example.
+But for now, have a nice day!","laravel,testing"
+"Testing in Laravel framework: step2 TDD calculator","Testing-with-Laravel-framework:-step2-TDD-calculator","Hello again, in the previous article i've explained how to run your first test. 
+Now we go a little more in detail and we tackle a real example.What we are going to do is write the calculator in TDD (test first). We incrementally build the calculator step after step. 
+The step will be the following:
+
+1. Create a simple String calculator with a method int Add(string numbers)
+2. The method can take 0, 1 or 2 numbers, and will return their sum (for an empty string it will return 0) for example “” or “1” or “1,2”
+3. Allow the Add method to handle an unknown amount of numbers
+<!-- more -->
+4. Allow the Add method to handle new lines between numbers (instead of commas).
+5. the following input is ok:  “1\\n2,3”  (will equal 6) the following input is NOT ok:  “1,\\n” (not need to prove it - just clarifying)
+6. Support different delimiters: to change a delimiter, the beginning of the string will contain a separate line that looks like this:   “//[delimiter]\\n[numbers…]” for example “//;\\n1;2” should return three where the default delimiter is ‘;’ .the first line is optional. all existing scenarios should still be supported
+ 
+Ok the first step is to have a fully working environment: we already have installed phpunit and php so we should start from the first test: constructor.
+
+	<?php 
+
+	  class CalculatorTest extends PHPUnit_Framework_TestCase{
+  
+	  /**
+	   * @test
+	   */
+	  public function canInitalizeCalculator()
+	  {
+		  new Calculator();
+	  }
+	}
+
+	class Calculator{
+		
+	}
+
+Now we know we have a fully working enviroment, lets get started with the step1. 
+We start always from the simple stuff, so let's calculate the sum of \"0\". keep in mind that I'm always making the test fail before writing the production code, but here i'm showing you the test code with the production code at the same time:
+
+	<?php
+	......
+	
+	 /**
+	   * @test
+	   **/
+	  public function canCalculateSum()
+	  {
+		$this->assertAdd(0,\"0\");
+	  }
+	
+	  protected function assertAdd($result, $input)
+	  {
+		$this->assertEquals($result, $this->calculator->add($input));
+	  }
+	
+	}
+	
+	class Calculator{
+	
+		public function add($string)
+		{
+		return 0;
+		}
+	}
+
+Allright, the test passes!  As you see i've made a method assertCalculate that basically check if the result of calculation will be equals.
+So now our calculator can calculate the sum of 0, pretty simple for now but it works. 
+Let's add some more compexity and our next step will be to calculate the sum of a number:
+
+	/**
+	   * @test
+	   **/
+	  public function canCalculateSum()
+	  {
+		$this->assertAdd(0,\"0\");
+		$this->assertAdd(2,\"2\");
+	  }
+
+	class Calculator{
+
+	  public function add($string)
+	  {
+	  return $string;
+	  }
+	}
+
+Ok good now let's try to add two numbers:
+
+
+	....
+	/**
+	   * @test
+	   **/
+	  public function canCalculateSum() {
+		$this->assertAdd(0, \"0\");
+		$this->assertAdd(2, \"2\");
+		$this->assertAdd(4, \"2,2\");
+	  }
+	  ....
+	     public function add($string) {
+        $numbers = [];
+        $j = 0;
+        for($i = 0; $i < strlen($string); $i++) {
+            if($string[$i] == \",\") {
+                $j++;
+            }
+            else
+            {
+                $numbers[$j]=$string[$i];
+            }
+        }
+
+        return array_sum($numbers);
+    }
+
+What the code does is to loop thrugh the string and get the various numbers, then return their sum. 
+This code works fine but when we try to sum a number with more then one digits the test will fail:
+
+	public function canCalculateSum() {
+			$this->assertAdd(0, \"0\");
+			$this->assertAdd(2, \"2\");
+			$this->assertAdd(4, \"2,2\");
+			$this->assertAdd(24, \"22,2\");
+		}
+		
+So now let's make it work with numbers with multiple digits:
+
+	public function add($string) {
+			$numbers = [];
+			$j = 0;
+			for($i = 0; $i < strlen($string); $i++) {
+				if($string[$i] == \",\") {
+					$j++;
+				}
+				else
+				{
+					$numbers[$j] = isset($numbers[$j]) ? $numbers[$j] . $string[$i] : $string[$i];
+				}
+			}
+	
+			return array_sum($numbers);
+		}
+
+Perfect, now we want to do the step 4. In order to do that we realize that this code is a little messy, in fact we can have a better solution with just a regular expression:
+
+	public function canCalculateSum() {
+        $this->assertAdd(0, \"0\");
+        $this->assertAdd(2, \"2\");
+        $this->assertAdd(4, \"2,2\");
+        $this->assertAdd(24, \"22,2\");
+        $this->assertAdd(30, \"22\\n2\\n6\");
+    }
+	
+    public function add($string) {
+        preg_match_all('/(\\d*)[\\\\n|,]?/', $string, $numbers);
+
+        return array_sum($numbers[1]);
+    }
+
+And here we are, now the code pick up the numbers separated by comma or new line and returns their sum. 
+Let's check for point 5 now. In order to do that we add this assert:
+
+	/**
+     * @test
+     **/
+    public function validatesInput()
+    {
+        $this->assertAdd(22, \"22\\n,2\\n6\");
+    }
+
+And this test fails, so now let's fix the code in order to make him stop when finds a wrong separator.
+
+	public function add($string) {
+	
+	  if(preg_match('/[,|\\\\n][,|\\\\n]{1}/', $string)) {
+		  throw new BadMethodCallException;
+	  }
+	  
+	  preg_match_all('/(\\d*)(?=[\\\\n|,])?/', $string, $numbers);
+	
+		return array_sum($numbers[1]);
+	}
+
+Allright it works now, but this isn't much readable isn't it? Let's do some refactoring!
+
+	public function add($string) {
+
+        $this->validateInput($string);
+
+        $numbers = $this->extractNumbers($string);
+
+        return array_sum($numbers);
+    }
+
+    /**
+     * @param $string
+     * @throws BadMethodCallException
+     */
+    protected function validateInput($string) {
+        if(! $this->hasValidDelimiters($string)) {
+            throw new BadMethodCallException;
+        }
+    }
+
+    /**
+     * @param $string
+     * @return int
+     */
+    protected function hasValidDelimiters($string) {
+        return ! preg_match('/[,|\\\\n][,|\\\\n]{1}/', $string);
+    }
+
+    /**
+     * @param $string
+     * @return mixed
+     */
+    protected function extractNumbers($string) {
+        preg_match_all('/(\\d*)(?=[\\\\n|,])?/', $string, $numbers);
+
+        return $numbers[1];
+    }
+	
+Here we go! Now we splitted up the code into many small readable methods: extract till you drop baby.
+Time for step 6 now, so let's write this test:
+
+	/**
+     * @test
+     **/
+    public function canSupportGivenDelimiter()
+    {
+        $this->assertAdd(25,\"//;\\n20;5\");
+    }
+
+We think that it's gonna fail but in fact... it passes! Lovely, so we have already solved that problem. The only problem is that certain input passes the sum while should throw and exception, let's write a test to fix that:
+
+	/**
+     * @test
+     * @expectedException \\BadMethodCallException
+     **/
+    public function validateCustomDelimiters()
+    {
+        $this->calculator->add(\"//;\\n22;,2,;;6\");
+    }
+	
+The test fail, so we need to fix our input validation.
+
+	 /**
+     * @param $string
+     * @throws BadMethodCallException
+     */
+    protected function validateInput($string) {
+
+        if($string[0] == '/' && $string[1] == '/')
+        {
+            $this->delimiters = [$string[2]];
+        }
+        else
+        {
+            $this->delimiters = $this->default_delimiters;
+        }
+
+        if(! $this->hasValidDelimiters($string)) {
+            throw new BadMethodCallException;
+        }
+    }
+
+    /**
+     * @param $string
+     * @return int
+     */
+    protected function hasValidDelimiters($string) {
+
+        $delimiters = '';
+        foreach($this->delimiters as $key => $delimiter) {
+            $delimiters.= $delimiter;
+            if($key != (count($delimiters)-1) )
+            {
+                $delimiters.=\"|\";
+            }
+        }
+
+        return ! preg_match('/['.$delimiters.']['.$delimiters.']{1}/', $string);
+    }
+
+Right, the test passes now. But now it's time to do some refactoring!
+
+
+    /**
+     * @param $string
+     * @throws BadMethodCallException
+     */
+    protected function validateInput($string) {
+
+        $this->parseDelimiters($string);
+
+        if(!$this->hasValidDelimiters($string)) {
+            throw new BadMethodCallException;
+        }
+    }
+
+    /**
+     * @param $string
+     */
+    protected function parseDelimiters($string) {
+        if($string[0] == '/'&&$string[1] == '/') {
+            $this->delimiters = [$string[2]];
+        }
+
+        $this->delimiters = $this->default_delimiters;
+    }
+
+    /**
+     * @param $string
+     * @return int
+     */
+    protected function hasValidDelimiters($string) {
+
+       return !preg_match(
+                '/[' . $this->createDelimitersString() . ']' .
+                '[' . $this->createDelimitersString() . ']' .
+                '{1}/', $string
+        );
+    }
+
+    /**
+     * @return string
+     */
+    protected function createDelimitersString() {
+        $delimiters = '';
+        foreach($this->delimiters as $key => $delimiter) {
+            $delimiters .= $delimiter;
+            if($key != (count($delimiters) - 1)) {
+                $delimiters .= \"|\";
+            }
+        }
+        return $delimiters;
+    }
+	
+Allright, now we have extracted the main logic again into small expressive methods. 
+That's all for now, we're done. But that's a lot more to talk about, so stay tuned for the step3!
+
+
+
+
+","testing"
+"PHP Value Object","php-value-object","Let's talk about, Value objects. The first thing to undersdand is why and when they are needed. Generally when you save some data you pair with a variable/attribute a value. In every programming language there are many type of values, for example strings,numbers and so on; imagine now that you need to save the number of apples and user have bought:
+
+	<?php 
+	$total_apples = 20;
+	<!-- more -->
+	
+What we did here was to set on a variable the number of our $total_apples: \"20\". This code is fine but in certain cases what we need is to associate a behavior with that simple number (or any other basic value). Imagine we want to save a monetary value:
+
+	<?php
+	$payment = 20.20;
+
+Here we will encounter many problems, the first one is the currency: in which currency we are working? how can we switch between currencies? How can we add value to the payment? What we have to do to handle the problem is to add many helper classes that manipulate that number for our needs, but that's **not** good. The right solution to this kind of problems is to create a Value Object: \"an object that rappresent a value and allow easy manipulation of his content\". When a value object is created is immutable and you can do operation on his value trough the value object only.
+How can you create a value object? Here is a minimistic example for the money problem:
+
+	<?php 
+	Class Money {
+		public function __construct($amount, $currency)
+		{
+			$this->amount = $amount;
+        	$this->currency = $currency;
+		}
+	}
+	
+	  public function getCurrency()
+	  {
+		  return $this->currency;
+	  }
+  
+	  public function getAmount()
+	  {
+		  return $this->amount;
+	  }
+	  
+	  public function compare(Money $other)
+	  {
+		  if($this->currency != $other->getCurrency())
+		  {
+			  throw new InvalidArgumentException(\"You cannot compare money of different currency\");
+		  }
+		  if ($this->amount < $other->amount) {
+			  return -1;
+		  } elseif ($this->amount == $other->amount) {
+			  return 0;
+		  } else {
+			  return 1;
+		  }
+	  }
+	  
+	 public function add(Money $addend)
+     {
+         if($this->currency != $other->getCurrency())
+		  {
+			  throw new InvalidArgumentException(\"You cannot compare money of different currency\");
+		  }
+
+        return new self($this->amount + $addend->amount, $this->currency);
+     }
+	
+	}
+	
+This is a really minimistic implementation but the most important concept is that a with this object we can compare money and do some operations with them easilly and the value stored in the object is handled but the value object class. As you can see the value object is immutable: in fact every time we need to change his value we create a new value object(add method). This is really important to avoid [aliasing problems](http://c2.com/cgi/wiki?ValueObjectsCanBeMutable). 
+If you want to see a fully implemented value object class for Money take alook here: [PHP Value Object implementation] (https://github.com/mathiasverraes/money/blob/master/lib/Money/Money.php)   
+Stay tuned and enjoy!  
+","design pattern"
+"Laravel Testing Redirect::back()","laravel-testing-redirect-back()","Hello guys, sometimes in your functional test you need to test a redirect, this is pretty easy to test except for the Laravel Redirect::back() method. I've found out that this is hard to test and the only solution to solve the problem is to fake a HTTP_REFERRER value. 
+<!-- more -->
+But keep in mind that in general the best approach is to don't use many Redirect::back() and instead use the redirect to a certain route, in fact is much more clearer from the test perspective to assert a redirect to a given route instead of a fake one.
+Anyways here's the solution:
+
+	<?php
+	
+	public function testRedirect(){
+	
+	$fake_url = \"/fake\";
+	$this->call('GET', '/url, [], [], ['HTTP_REFERER' => $fake_url]);
+	
+	$this->assertRedirectedTo($fake_url);
+	}
+	
+Enjoy!","laravel,testing"
+"PHP: why and when static is evil","php-why-and-when-static-is-evil","Hello guys, many pepole asked me in various situation if they should use static in their code, for this reason i decided to briefly explain why static is generally a bad choiceh and in which cases you can use it.
+<!-- more -->
+Before explaining you when and when not to use static you need to know the difference between static and istance variables.
+The difference is that with a static variable his value will remain the same for the full execution of the process, anytime you access it. With an instance variable instead that values is binded to the instance of the class (the object!) and can be different for every new istance of the class. Let's make and example:
+
+	<?php 
+		Class A
+		{
+			public static $static_var;
+			public $instance_var;
+		}
+
+		$a1 = new A;
+		$a1::$static_var = \"static!\";
+		$a1->instance_var = \"a1\";
+		$a2 = new A;
+		$a2->instance_var = \"a2\";
+		
+		echo $a1->instance_var;
+		echo $a2->instance_var;
+		echo $a1::$static_var;
+	    echo $a1::$static_var
+		
+		// here's the output
+		\"a1\"
+		\"a2\"
+		\"static!\"
+		\"static!\"
+		
+So as you can see the static value is binded to the class and not the instance. So now i'm goint to point the problems of static variables. 
+One big problem is that static state is hard to test! In fact whant you make your unit tests you cannot change a static part of the class and stub it, because by doing that you change is use in all the process, and in all the subsequent tests that will be run in the SUT(Suite under test).
+The second reason is that you cannot compose object and handle dependency in a dynamic way (everyting is global and doesn't change) and because OOP is the best tool to manage software depencency you basically loose all the advantages of OOP. 
+But now you may say: \"What are static state made for?\" well in fact there is one case where you can use static variable and the answer is quite obvious, when you need a global state in all the application process. For instance if you want to set the user information available globally in the application (assuming you won't change them only for a part of the software). Also for all the laravel developers keep in mind that Facades are not static they are instance object binded with the IOC container!
+I'd like to go deeper in the details but i'm out of time for now.
+
+Have a nice time and be proud of yourself: you're coders!
+","design pattern,programming rules"
+"Test double php introduction","test-double-introduction","When you start unit testing your code you don't want to test a full behavior of your code but just a little part in isolation to the rest. 
+In order do do that you need to isolate your class from the other context, test doubles are tools (aka patterns) that allow you to do that.
+There are five common test double:
+
+1. Dummy
+2. Stub
+<!-- more -->
+3. Spy
+4. Mocks
+5. Fake
+
+A Dummy is an object that doest nothing (dummy) and it's passed to your object, you use dummy in order to pass mandatory field to your object but you don't really use them in your SUT (Suit under test). Here's an example of a dummy in php:
+
+	Class DummyItem{}
+	
+	Class TestedClass{
+		public function __construct($item){
+			$this->item = $item;
+		}
+	}
+	
+Because your tested class depend on item you need to pass in an item but the class is not using the item in the reality of the test, the dummy is passed just do avoid runtime errors.
+
+A Stub is something more intelligent than a simple Dummy, in fact it's used to force the execution of your code in a certain way, let's see an example:
+
+	Class ExpensiveItemStub{
+		public function getPrice(){
+			return 1000000;
+		}
+	}
+	
+	class CustomerStub{
+		public function getMoney(){
+			return 100;
+		}
+	}
+	
+	Class TestedClass{
+		public function canBuyItem($customer, array $items){
+			$total_price = $this->calculateSum($items);
+			
+			if($total_price > $customer->getMoney() )
+			{
+				throw new Exception;
+			}
+		}
+		
+		public function calculateSum(array $items){
+			$sum = 0;
+			array_walk($items, function($item){
+				$sum+=$item->getPrice();
+			});
+			return $sum;
+		}
+	}
+	
+	Class Test{
+	
+		/**
+		* @expectedException Exception
+		*/
+		public function testCannotBuyOverpricedItems(){
+			$tested = new TestedClass();
+			
+			$tested->canBuyItem( ( new CustomerStub), [(new ExpensiveItemStub)]);
+		}
+	}
+	
+What we do here is to create a CustomerStub and an ExpensiveItemStub in order to force the error Exception. So Stub help us to make the code follow a certain path.
+
+Spies are something more clever than stub, in fact a spy can log some operation that is does and you can ask the class if something has occured, here's an example:
+
+	class ItemSpy{
+		protected $has_called = false;
+	
+		public funcion callMethod(){
+			$this->has_called = true;
+		}
+		
+		public function hasCalledMethod(){
+			return $this->has_called;
+		}
+	}
+
+
+Then in your test you can do something like that:
+
+	$spy = new ItemSpy();
+	
+	$testClass = new TestClass($spy);
+	
+	// do some operation that calls callMethod on the spy
+	
+	// then assert:
+	$this->assertTrue($spy->hasCalledMethod());
+	
+The smartest guy here is the Mock with a Mock object you can write expetations and then ask for them, there are many Mock library around for php, you can also create custom mock for your needs. Here's a simple example:
+
+	class ItemMock{
+	
+		protected $has_called;
+	
+		public function callable(){
+			$this->has_called = true;
+		}
+		
+		public function checkExpetations()
+		{
+			if (! $this->has_called) throw new Exception(\"assertion explanation goes here\");
+		}
+	
+	}
+	
+	// then in your code
+	
+	// do something
+	
+	$mock->checkExcpetations();
+	
+When checking expetations if something goes wrong the mock will throw you an exception and write you a message that explains the problem, for this reason you generally put on your tearDown method the mockery::close() or some other method depending on the library you use that checks for your expetations. Common php mocking library are: [Mockery](https://github.com/padraic/mockery) or [phrophecy](https://github.com/phpspec/prophecy).
+
+Finaly the Fake, a fake is an implementation that behave similiary as the real implementation but it's not suitable for production environment, the most common example is an in-memory Sqlite database to speed up tests.
+
+Here we are, i've done the introduction to Test Double. Hope you enjoy! 
+
+
+
+
+","design pattern,testing"
+"The best shell for progamming: oh my zsh","the-best-shell-for-progamming-oh-my-zsh","Hello guys, it's been years that i'm using bash as my preferred shell. Recently i've found a cool tool that you should try, it's called: [oh my zsh](http://ohmyz.sh/). What's that? It's zsh: basically bash with some more features and also have cool plugins made by develpers that you can enable to have easier time progamming in your preferred language. 
+<!-- more -->
+There are more then 150 plugins and you should definatelly take a look at that!
+the install is also really easy, for example here's the command to run on MacOSX 'curl -L http://install.ohmyz.sh | sh' and you're done!
+
+Take a look and enjoy this cool tool! ","management"
+"Strong Typing vs Duck Typing PHP, C#, Ruby","strong-typing-vs-duck-typing","If you have heard of strong and weak typing but doesn't know the main difference and advantages/disadvantages of both the paradigms in this article I'll try to help you having a better undestanding of the overall concept.
+The first thing you need to understand is what types are. When you save some data in the memory you can associate to that space of memory a data-type, by associating a type you can have different behavior when manipulating that piece of data. In an object orientet language generally there are two main categories of data:
+
+<!-- more -->
+
+1) simple data: such as string, int, float;
+2) object data: the type of the object
+In non object oriented languages you only use simple data. 
+Here is an example in c# that show how data types influence behavior when manipulating data:
+
+	 		// a string contaning text data
+            string text = \"some text\";
+            // output: some text and some more text
+            Console.WriteLine(text + \" and some more text\");
+            // a int number
+            int number1 = 200;
+            // here i use the + operator on a int and a string, the compiler automatically convert the number into a string
+            // in this case the + operator is the string operator and concatenates the strings
+            string number2 = number1 + \"Some text\";
+            // output: 200Some text
+            Console.WriteLine(number2);
+            // here the + operator is the sum operator and calculate it's sum
+            int number3 = number1 + 10;
+            // output: 210
+            Console.WriteLine(number3);
+			
+Data type is a way to associate different behavior to different values. 
+In a strong typed language when you pass a variable to a method (or more generally a function) you need to tell the receiver the type of that variable: if  it's an object his class, if it's a simple type his data type. As i said the compiler need to know the type of that data in order to manipulate it. With duck typed languages that restriction is not needed, you can pass variable containing any type of data to the method and the interpreter will handle that data depending on his value. How can you achive that? By using certain special rules that differ for each language called \"transoformation rules\"; depending on the value of the variables the interpreter will infer his type and do different operations do the data. Here is an example in php:
+
+	// as you can see we don't say that text is a string
+	$text = \"text\";
+	// output: text10
+	echo $text . 10;
+	
+In this example the interpreter will use the number 10 as a text and appends that to the \"text\" string.
+By using a duck typed language also appear the concept of a falsy/truthy value; they rappresent values that are interpreted as boolean false/true in an if statement. While in strong typed language you can only put a boolean expression in an if statement in a duck typed language you can put anything and the interpreter will use the result as a boolean value. For example in php a truthy is: booelan, true and anything except 0 null and false. In ruby instead a truthy is anything except false or nil.
+Here is an example:
+	ruby: 
+	truthy = 10
+	# output: this is truthy
+	puts \"this is truthy\" if truthy
+
+	php
+	$truthy = \"lalalal\";
+	if($truthy)
+		echo \"this is a truthy\"
+
+	c#
+	int a = 10;
+	// you cannot do that in  c# will throw a compiler error!
+	if(a)
+		Console.write(\"This is not possible\");
+
+Now that you know what is a truthy and a falsy and the main difference between strong and duck typed programming I'll show you the main advantages/disadvantages.
+
+With a strong typed language:
+	1. better performance
+	2. with type check at compile time you have less programming errors
+
+The better performance is something completely true, in fact the strong typed language are compiled languages and as the compiler knows the various data type it can do some better optimization; so if you need high performance you may have to go for a strong typed language (unless you need to scale it and in that case you may go with a functional language instead such as clojure or erlang). 
+The point 2 is true aswell but you need to be aware that runtime error will still happen, so you are have still a free room for mistakes and the error that you can find at compile-time are small and easy to fix, while runtime errors are the most dangerous ones!
+
+With a duck typed language instead:
+	1. After some experience you find the code less verbose and more easy to understand
+	2. Easy metaprogrammming
+	3. Development is faster without the make/compile time
+	
+In fact i find myself an easier time understanding duck typed language and also can write more behavior with less code because or the language being less verbose in general (especially with ruby). Development time is aswell faster because of no compile time.
+About metaprogramming it's a good feature if it's used properly but can land to disaster if misused. A good example of metaprogramming is how Rails Active record creates automatically the method to access his attributes at runtime depending on your database schema.
+The last but not least important thing are interfaces: interfaces are created for strong typed language and their purpose is to try to detach the dependency method->class by showing the messages that they transfer; by using interfaces you can swap the implementation and be sure that the message exchanged between objects is correct. In a duck typed language you don't need interfaces, that leto you have less boilerplate and more flexible code but you have to be aware of finding the code dependency yourself, so you pay the bill for more flexibility you have to be more careful! Keep in mind testing in duck typed language is even more needed because of that flexibility. Ruby community for example have focused a lot on testing in order to help keeping the code clean and easy to extend. 
+Thats the last post of 2014 so Happy new year everybody!
+
+
+	
+","programming rules"
+"Coffeescript Model class with attr_accessor rails alike","coffeescript-model-class-with-attr_accessor-rails-alike","Nowadays I've been toying around with the fabolous coffeescript language and I've created a basic model class. <br/>
+This class allow you to use attr_accessor method as you can do in Ruby.
+If you don't know what attr_accessor is you can take a look here: [Ruby attr_accessor](http://ruby-doc.org/core-2.2.0/Module.html#method-i-attr_accessor).<br/> 
+Briefly what attr_accessor does is to let you access object attributes in \"object.attribute\" form (which in javascript is built in) but more importantly let you add a constrain on read/write permission of that attribute!
+In fact if you want the attribute to be readonly you need to use the \"attr_reader\" method, in the opposite case you need to use the \"attr_writer\" method. If you don't want to add any constraint you can use the \"attr_accessor\". 
+<!-- more -->
+
+Here is the code of the model:
+
+	# this creates a root namespace that works with browser or node.js
+	root = exports ? this
+	#uppercase the first letter	
+	root.namespace.ucFirst = (field) ->
+		field.charAt(0).toUpperCase() + string.slice(1);
+	
+	root.namespace.Model = class Model
+	  get: (field) ->
+		# call getter if exists
+		getter = \"get#{root.namespace.ucFirst(field)}\"
+		return this[getter]() if (typeof this[getter] == \"function\")
+		@attributes[field]
+	
+	  set: (field, value) ->
+		# call setter if exists
+		setter = \"set#{root.namespace.ucFirst(field)}\"
+		return this[setter](value) if (typeof this[setter] == \"function\")
+		@attributes[field]=value
+	
+	  defineAttribute: (field, type) ->
+		@attributes ||= {}
+		prop = {}
+		prop[field] = {}
+		prop[field].get = () -> @get(field, originalGetter) unless type == \"writer\"
+		prop[field].set = (value) -> @set(field, value) unless type == \"reader\"
+		Object.defineProperties(@ , prop)
+	
+	  attr_accessor: (field) ->
+		@defineAttribute(field, \"all\")
+	
+	  attr_reader: (field) ->
+		@defineAttribute(field, \"reader\")
+	
+	  attr_writer: (field) ->
+		@defineAttribute(field, \"writer\")
+
+What this code does is to create the methods: \"attr_writer, attr_reader, attr_accessor\". In order to use this model you need to inherit from him in your class with \"extends root.namespace.Model\". 
+Here is an example of usage:
+
+	class Test extends root.namespace.Model
+		constructor: () ->
+			@attr_reader \"readonly\"
+			@attr_writer \"writeonly\"
+			@attr_accessor \"accessor\"
+			
+		getTest: ->
+			\"test\"
+	
+	test = new Test
+	# write the attribute but cannot read from him
+	test.writeonly = \"write\"
+	# can read from outside but cannot write	
+	console.log test.readonly	
+	# can read and write data
+	test.accessor = \"writable and readable\"
+	console.log test.accessor
+	#if you have a get\"AttributeName\" method or set\"AttributeName\" method it gets called instead of fetching the attribute
+	console.log test.test 	# writes \"test\"
+	
+That's all forks. If you have any question or comment feel free to use the disquis form below.
+Enjoy.
+	
+
+	","coffeescript"
+"Devise remote authentication with rails 4.2","devise-remote-authentication-with-rails-4-2","Hello guys, I've been trying to make remote authentication working with devise and i found this useful post: [devise remote authentication](http://4trabes.com/2012/10/31/remote-authentication-with-devise/). The problem is that the post example wasn't working correctly with new devise versions (3.4.x); 
+In this post I'll explain you the changes that you need to do to make it work with devise 3.4.
+<!-- more -->
+Note: Before reading the following part read the other article.
+The problem are the changes to Devise Authenticatable class regarding the serialization methods. In order to make it work you need to use the following code in your RemoteAuthenticatable Strategy:
+
+	module Devise
+  		module Models
+    		module RemoteAuthenticatable
+
+  	        module ClassMethods
+
+		   def serialize_from_session(username, password)
+			 resource = User.new
+			 resource.username = username
+			 resource.password = password
+			 resource
+		   end
+
+		   def serialize_into_session(resource)
+			 #IMP you can only pass two params, no more because of this code :
+		 	 # devise.rb.466      args = key[-2, 2]
+	 		 [resource.username, resource.password]
+		   end
+		 end
+  
+	  	 end
+		end
+	end
+	
+What happens is that devise passes the result of serialize_into_session to serialize_from_session but it fetches only the last 2 items of the return value: \"args = key[-2,2]\".
+for this reason you need to pass the needed information in a two item array in order to make this work (if you need more data replace the items with an hash). In this example we use the username to identify in a unique way the user and then we create an user with the given username when we deserialize the item (you can also have a custom method that fetches the model form a temporary memory data or a model saved in the database).  
+I hope you found this article useful! If you have any question feel free to ask me (will help to increase the quality of the post).
+Happy coding and enjoy ruby!
+","devise,ruby,ruby on rails"
+"Testing for custom Rails validators with Rspec and metaprogramming","testing-for-custom-rails-validators-with-spec-and-metaprogramming","Hello guys, some days ago I've made a custom validator for Rails and I wanted to test that it was used correctly in my model (which uses ActiveModel::Model). 
+As a brief preface you have to know that to test for the common Rails validators you can use the [shoulda matchers](https://github.com/thoughtbot/shoulda-matchers) library. 
+<!-- more -->
+But in my case what I've done is to unit test the validator (I won't discuss about that) and then I've made a custom matcher to verify that the given classes uses the validator correctly. In order to test for the validator presence in the model I've leveraged Ruby metaprogramming. Here is the code where the custom validator is used:
+
+	Class MyModel 
+		include ActiveModel::Model
+		
+		validates_with MyValidator, attributes: :urr
+
+And here is the custom matcher code: 
+	
+	 RSpec::Matchers.define :have_my_validator do |attr_name|
+      # Check for all the callback that have MyValidator on the given attribute attr_name
+      match do |actual|
+        validator = actual._validate_callbacks.select {|callback|
+          callback.filter.attributes == [attr_name.to_sym] &&
+              callback.filter.class == MyValidator
+        }
+        expect(validator.size).to be > 0
+      end
+    end
+	
+What the matcher does is to:
+
+1. Fetch the list of all the validation used in the model
+2. Search for a validator fo MyValidator class and that is applied on a given attribute name
+3. If any is found the test passes otherwise it fails.
+
+You can use the validator as following:
+	      expect(object).to have_my_validator(:urr)
+		  
+You can also be more DRY and extract the class name as a parameter and then use it to match any kind of validator.
+
+That's all for now. Happy coding!
+
+
+
+","metaprogramming,ruby on rails,testing"
+"Ruby: Dynamically create callbacks with metaprogramming","ruby-how-to-dynamically-create-callbacks-with-metaprogramming","Hello guys, in this post I'll explain you how you can handle callbacks with metaprogramming on ruby on rails. But before going deeper into detail you should ask me the reason of that: why shall you use callbacks instead of using general oop techniques? 
+For example in a classic oop design given that you have:
+
+	Class X
+	   def method_x(*args)
+	 	  #do something
+	   end
+  	end
+<!-- more -->
+if you want to do something after calling method x you can easilly override the method in a module like this:
+
+	module X
+		def method_x(*args)
+			super(*args)
+			# do something more
+		end
+	end
+
+And then include the module X in your class X.
+So why should you handle that with metaprogramming? As first in certain situations you cannot override the method using a classical oop approach, for example when you are already leveraging some metaprogramming to dynamically create a method_x inside an included module like this:
+
+	module Y
+		def self.included(base)
+			base.instance_eval do
+				def method_x(*args)
+					# do something
+				end
+			end
+		end
+	 end
+	
+In that case the method_x is dynamically created and you cannot override it easilly and use the \"super\" classical oop, therefore you need to handle that with a callback. Callbacks also allow you to handle that in a more fashioned and readable way. 	
+Let me show you how can you do an after_method_x callback:
+Firs of all include the Callbacks method i've created:
+
+	module Callbacks
+  		extend ActiveSupport::Concern
+
+	  module ClassMethods
+		  def do_after(method)
+			guid = SecureRandom.uuid
+			define_method(\"#{guid}\") do |*args|
+			  yield self, __send__(\"#{guid}_#{method}\", *args), *args
+			end
+			alias_method \"#{guid}_#{method}\", method
+			alias_method enum, \"#{guid}\"
+		  end
+		end
+	 end
+	 
+When you use the method do_after it creates a new method using guid to ensure uniqueness, that method yields self allowing to pass a custom block, and then calls the original method aliased as #{guid}_#{method}.
+To use that in your class you coud do like this:
+
+	Class X
+	  	include Callbacks
+		do_after(:method_x) do |klass, result, *args|
+			# do wathever you like here in the block
+		end
+	 end
+
+And we have handled a do_after leveraging metaprogramming. I let you imagine the other hooks by yourself.
+Have fun and Happy coding!
+","metaprogramming,ruby,ruby on rails"
+"Solve problems gracefully with dynamic method generation in ruby","solve-problems-gracefully-with-dynamic-method-generation-in-ruby","Days ago i was writing an Rspec macro to gracefully handle authenticated api via a token. At the start i begun creating a couple of methods, each for every Rest verb: 
+	module RequestMacros
+	  def get_authorized(uri, user)
+		get uri, nil, {'X-Api-Token' => user.api_token}
+	  end
+	
+	  def post_authorized(uri, data, user, headers = {})
+		post uri, data, headers.merge({'X-Api-Token' => user.api_token})
+	  end
+<!-- more -->
+
+	  def patch_authorized(uri, data, user, headers = {})
+		patch uri, data, headers.merge({'X-Api-Token' => user.api_token})
+	  end
+	
+	  def put_authorized(uri, data, user, headers = {})
+		put uri, data, headers.merge({'X-Api-Token' => user.api_token})
+	  end
+	
+	  def delete_authorized(uri, user)
+		delete uri, nil, {'X-Api-Token' => user.api_token}
+	  end
+	end
+	
+As you can see from the code above there is some code duplication, in fact the authorized methods get,delete and post,patch,puth shares the same code besides the fact that the method called is different, for example post_authorized calls post etc. In a general OOP approach we could just extract the logic into a shared method that accepts the verb name to be called and then makes a call with that name. But this time i decided to leverage some ruby metaprogramming technique. In the code below we dynamically create in pair the get,delete and post,patch,put methods; in fact the only thing that changes is the method name #{m}. Here is the code:
+
+	module RequestMacros
+	  %w(get delete).each do |m|
+		class_eval <<-eoc
+		  def #{m}_authorized(uri, user)
+			  #{m} uri, nil, {'X-Api-Token' => user.api_token}
+		  end
+		eoc
+	  end
+	
+	  %w(post patch put).each do |m|
+		class_eval <<-eoc
+		  def #{m}_authorized(uri, data, user, headers = {})
+		  	#{m} uri, data, headers.merge({'X-Api-Token' => user.api_token})
+		  end
+		eoc
+	  end
+	end
+	
+What we just did is with every verb make a method verb_authorized that calls verb, we couldn't do that without ruby metaprogramming tools! Leveraging metaprogramming allow us to build readable and compact code in a very fascinating way. That's all for today, happy coding!","metaprogramming,rspec,ruby"
+"JSON API error handling with ruby","json-api-error-handling-with-ruby","Hello folks, after being inactive for a while I am finally back!  
+This post is about a technique that I found useful for general error handling with REST API and ruby on rails, but the concept works for any programming language/framework.
+Most of the time programmers handles api errors without a general pattern, that's bad because it's obvious that is more error prone, by using a general pattern you can also do some interestic automatic operations such as error logging and messaging to a monitoring service. 
+<!-- more -->
+The base of the approach that i've choose is handling errors with Exceptions(that's what they are made for actually). What we do is create a general exception handler that given an exception name and data will return a particular error response as json depending on which kind of exception was thrown. 
+The basic idea is to configure the error handler with and exception name associated to a configuration hash.
+In order to make things smoother and be as DRY as possible I've made a ruby gem and pushed it to rubygems, if you are interested you can [take a look at the docs here](https://github.com/intrip/jsonapi_errors)
+
+","rest,ruby,ruby on rails"
+"Javascript multiple inheritance with ES5 and AngularJs","javascript-multiple-inheritance-with-es5-and-angularjs","In this article I'll show you how you can use multiple inheritance(trait) with Javascript EcmaScript 5 and AngularJS 1.0.
+AngularJS offer you a method: _angular.extend_ that allow you to extend any object with the values and methods of other objects.
+In this article I show you how you can create a Dog. Dog is an animal but is also a mammal, for this reason a Dog needs to extend animal and also Mammal classes.
+Below is the code to create a Dog:
+
+<!-- more -->
+
+	(function(){
+	app.Animal = function(){};
+	app.Animal.prototype = {
+		animal: function(){
+			return \"Hello i am an animal\";
+		}
+	};
+
+	app.Mammal = function(){};
+	app.Mammal.prototype = {
+		mammal: function(){
+			return \"I am a mammal\";
+		}
+	};
+
+	app.Dog = function(){};
+	app.Dog.prototype = {
+		dog: function () {
+			return \"I am a dog\";
+		}
+	};
+	// dog is an animal but also a mammal
+	angular.extend(app.Dog.prototype, app.Animal.prototype, app.Mammal.prototype);
+	// wrap to not pollute the global namespace
+	})(window.app || (window.app ={}));
+
+	var dog = new app.Dog();
+	
+	// Hello I am an animal
+	console.info(dog.animal());
+	// Hello I am a mammal
+	console.info(dog.mammal());
+	// Hello I am a dog
+	console.info(dog.dog());
+	
+As you can see you can extend multiple classes (Mammal and Animal) from the Dog class.
+Here it is! Now you know that you can easily implement traits in Javascript using angular.extend() method.
+Happy coding!","design pattern,javascript"
+"Thinner Rails Model with the Finder Pattern","thinner-rails-model-with-the-finder-pattern","Hello everybody, today I want to share with you a pattern learned from **gitlab**: the **finder** pattern.
+
+Most of the time when you want to find an item based on a set of different conditions you do something like this:
+
+	class Project
+  		def issues_for_user_filtered_by(user, filter)
+    		# A lot of logic not related to project model itself
+  		end
+	end
+
+By doing that you end up having a lot of methods that does not really belong to the Model logic.
+A better solution is through the **finder** pattern: 
+
+	issues = IssuesFinder.new(project, user, filter).execute
+	
+What the finder does is to accept a set of parameters and return an `ActiveRecord::Associations::CollectionProxy` that you can use for further filtering/mapping operations.
+
+You can find a complete example of a finder [following this link](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/app/finders/issuable_finder.rb)
+
+
+","design pattern,ruby,ruby on rails"
+"Different caching strategies for Rails.cache and ActionController::Caching","different-caching-strategies-for-rails-cache-and-actioncontroller-caching","If you need to use different caching strategies for your Rails.cache and your ActionController::Cache (used for fragment caching) just put the following in your `config/environments/env.rb` file:
+
+```
+     config.action_controller.perform_caching = true
+     # this is used for your Fragment cache
+     config.action_controller.cache_store = :file_store, 'action_controller_tore_path'
+     # this is used for Rails.cache
+     config.cache_store = :file_store, 'cache_store_path'
+```","ruby on rails"
