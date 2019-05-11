@@ -30,6 +30,9 @@ theme: minima
 plugins:
   - jekyll-feed
 
+# theme settings
+show_excerpts: true
+
 defaults:
   - scope:
       path: "assets/img"
