@@ -31,7 +31,7 @@ Fill it with the given code:
 
 This will create a simple form looking like this:
 
-![file](/assets/img/image-1389133286160.png)
+![file]({{ "/assets/img/image-1389133286160.png" | relative_url }})
 
 At this point we need to create the controller actions(one for get and one for post) and then register them in the route files. Lets start creating them in the controller. Open the file "app/controllers/HomeController.php" and fill it with the given values:
 

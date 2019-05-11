@@ -23,7 +23,7 @@ Single table inheritance is based on mapping all the class hierarchy on a single
 Imagine the hierarchy of animals and in particular dogs and cats, they both are pets and but they are also animals. Imagine now that every animal have the attribute sex, pet have name and dog collar.
 Here is the UML diagram of the class structure:
 
- ![file](/assets/img/image-1387843145287.png)
+ ![file]({{ "/assets/img/image-1387843145287.png" | relative_url }})
 
 And here is the code that creates the structure in the db following the pattern:
 ~~~~~~~~~~~~~~~~~~~~~
