@@ -32,6 +32,8 @@ plugins:
 
 # theme settings
 show_excerpts: true
+disqus:
+    shortname: jacopobeschi
 
 defaults:
   - scope:
