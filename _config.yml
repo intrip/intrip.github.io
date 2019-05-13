@@ -37,17 +37,8 @@ disqus:
     shortname: jacopobeschi
 
 # Pagination settings
-pagination:
-  enabled: true
-  per_page: 5
-  permalink: '/page/:num/'
-  title: ':title - page :num of :max'
-  limit: 0
-  sort_field: 'date'
-  sort_reverse: true
-
-# Produces a cleaner folder structure when using categories
-permalink: /:year/:month/:title.html
+paginate: 5
+paginate_path: "/posts/page:num/"
 
 defaults:
   - scope:

@@ -17,7 +17,7 @@
         </label>
 
         <div class="trigger">
-          {% assign sorted_pages = site.pages | sort: 'order' %}
+          {% assign sorted_pages = site.pages | sort: 'order' | where:"menu",true %}
           {% for my_page in sorted_pages %}
               {% if my_page.title and my_page.autogen == nil %}
               {%- if my_page.title -%}
