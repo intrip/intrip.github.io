@@ -269,3 +269,44 @@
 .icon-mid {
   font-size: 25px;
 }
+
+// search area
+.search-container {
+  border-bottom: 1px solid $grey-color-light;
+  text-align: right;
+
+  .search-field {
+    width: 20%;
+    border-left: 1px solid $grey-color-light;
+    border-bottom: 1px solid $grey-color-light;
+    border-top: 1px solid $grey-color-light;
+    border-right: 0;
+    padding: 6px;
+    margin: 8px 0;
+    font-size: 16px;
+
+    @include media-query($on-palm) {
+      width: 78%;
+    }
+  }
+
+  .search-submit {
+    &:hover {
+      background: #ccc;
+    }
+
+    float: right;
+    padding: 6px 10px;
+    margin-top: 8px;
+    margin-right: 16px;
+    background: #ddd;
+    font-size: 17px;
+    border: 0;
+    cursor: pointer;
+
+    @include media-query($on-palm) {
+      width: 10%;
+    }
+
+  }
+}
