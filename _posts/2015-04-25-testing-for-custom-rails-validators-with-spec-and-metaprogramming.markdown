@@ -2,7 +2,7 @@
 layout: post
 title: 'Testing for custom Rails validators with Rspec and metaprogramming'
 date: 2015-04-25 09:45:00
-categories: ['metaprogramming',ruby on rails',testing']
+categories: ['metaprogramming','ruby on rails','testing']
 ---
 Hello guys, some days ago I've made a custom validator for Rails and I wanted to test that it was used correctly in my model (which uses ActiveModel::Model). 
 As a brief preface you have to know that to test for the common Rails validators you can use the [shoulda matchers](https://github.com/thoughtbot/shoulda-matchers) library. 

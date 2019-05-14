@@ -2,7 +2,7 @@
 layout: post
 title: 'SOLID Design principles and Php: Liskov substitution'
 date: 2014-02-10 19:52:00
-categories: ['design pattern',solid']
+categories: ['design pattern','solid']
 ---
 Hello everybody, today we talk about the third letter (L) of **SOLID** principles: Liskov substitution. This principle has a mathematical definition pretty hard to understand, but in practise it says: every time you create a subclass of a superclass that subclass should be substitutable in every place where the original class took place. Let's dig in with an example. Imagine we create a player class. 
     <!-- more -->

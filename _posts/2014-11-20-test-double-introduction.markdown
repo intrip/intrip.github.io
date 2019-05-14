@@ -2,7 +2,7 @@
 layout: post
 title: 'Test double php introduction'
 date: 2014-11-20 21:32:00
-categories: ['design pattern',testing']
+categories: ['design pattern','testing']
 ---
 When you start unit testing your code you don't want to test a full behavior of your code but just a little part in isolation to the rest. 
 In order do do that you need to isolate your class from the other context, test doubles are tools (aka patterns) that allow you to do that.

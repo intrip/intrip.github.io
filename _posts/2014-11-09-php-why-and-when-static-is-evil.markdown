@@ -2,7 +2,7 @@
 layout: post
 title: 'PHP: why and when static is evil'
 date: 2014-11-09 22:35:00
-categories: ['design pattern',programming rules']
+categories: ['design pattern','programming rules']
 ---
 Hello guys, many pepole asked me in various situation if they should use static in their code, for this reason i decided to briefly explain why static is generally a bad choiceh and in which cases you can use it.
 <!-- more -->

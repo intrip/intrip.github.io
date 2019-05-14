@@ -2,7 +2,7 @@
 layout: post
 title: 'SOLID Design principles and Php: Interface Segregation'
 date: 2014-02-24 20:48:00
-categories: ['design pattern',laravel',solid']
+categories: ['design pattern','laravel','solid']
 ---
 Ok guys we're almost done with the SOLID principles series, today we talk about the interface segregation principle. The **Interface segregation** principle says: "A client should not be forced to implement and interface that doesn't use". As we are used let's explain that with an example. Imagine we are using the [repository pattern](http://martinfowler.com/eaaCatalog/repository.html) to save some objects. 
 <!-- more -->

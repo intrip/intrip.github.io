@@ -2,7 +2,7 @@
 layout: post
 title: 'Solve problems gracefully with dynamic method generation in ruby'
 date: 2015-08-20 19:46:00
-categories: ['metaprogramming',rspec',ruby']
+categories: ['metaprogramming','rspec','ruby']
 ---
 Days ago i was writing an Rspec macro to gracefully handle authenticated api via a token. At the start i begun creating a couple of methods, each for every Rest verb: 
 	module RequestMacros

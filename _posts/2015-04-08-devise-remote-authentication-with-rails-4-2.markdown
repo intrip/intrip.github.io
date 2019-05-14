@@ -2,7 +2,7 @@
 layout: post
 title: 'Devise remote authentication with rails 4.2'
 date: 2015-04-08 21:19:00
-categories: ['devise',ruby',ruby on rails']
+categories: ['devise','ruby','ruby on rails']
 ---
 Hello guys, I've been trying to make remote authentication working with devise and i found this useful post: [devise remote authentication](http://4trabes.com/2012/10/31/remote-authentication-with-devise/). The problem is that the post example wasn't working correctly with new devise versions (3.4.x); 
 In this post I'll explain you the changes that you need to do to make it work with devise 3.4.

@@ -2,7 +2,7 @@
 layout: post
 title: 'Thinner Rails Model with the Finder Pattern'
 date: 2017-03-20 09:17:00
-categories: ['design pattern',ruby',ruby on rails']
+categories: ['design pattern','ruby','ruby on rails']
 ---
 Hello everybody, today I want to share with you a pattern learned from **gitlab**: the **finder** pattern.
 

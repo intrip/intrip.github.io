@@ -2,7 +2,7 @@
 layout: post
 title: 'SOLID Design principles and Php: Dependency inversion'
 date: 2014-03-11 12:40:00
-categories: ['design pattern',laravel',solid']
+categories: ['design pattern','laravel','solid']
 ---
 This is the last article about the SOLID principles series. In this article we talk about the D in SOLID: "**Dependency inversion**".  This last part may be the harder to understand for you guys. Before saying the principle we need to explain some definitions:
 - **High level code**:  the code that is focused on solving a general problem (For example db access)

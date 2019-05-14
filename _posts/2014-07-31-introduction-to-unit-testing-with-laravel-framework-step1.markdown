@@ -2,7 +2,7 @@
 layout: post
 title: 'Introduction to Unit testing with Laravel framework: step1'
 date: 2014-07-31 13:17:00
-categories: ['laravel',testing']
+categories: ['laravel','testing']
 ---
 When i first came into programming i didn't even know what self tested code was and how much it's important for a developer. This article is for developers that want to start unit testing with laravel framework or php in general.
 Before going into details i'd like to explain you briefly what is unit testing and automated code tests. Automated code tests are programs that verify automatically that your application works as expected.

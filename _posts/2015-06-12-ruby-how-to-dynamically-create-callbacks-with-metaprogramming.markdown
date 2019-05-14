@@ -2,7 +2,7 @@
 layout: post
 title: 'Ruby: Dynamically create callbacks with metaprogramming'
 date: 2015-06-12 18:35:00
-categories: ['metaprogramming',ruby',ruby on rails']
+categories: ['metaprogramming','ruby','ruby on rails']
 ---
 Hello guys, in this post I'll explain you how you can handle callbacks with metaprogramming on ruby on rails. But before going deeper into detail you should ask me the reason of that: why shall you use callbacks instead of using general oop techniques? 
 For example in a classic oop design given that you have:

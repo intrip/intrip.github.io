@@ -22,8 +22,8 @@ def build_post(title, publish_date, categories, content)
   end
 
   # prepend /assets to images and removes the site url
-  post.gsub!(/\[file\].*(\/img\/image-)/) do
-    "[file](/assets#{$1}"
+  post.gsub!(/\[file\].*(\/img\/image-.*\.png)/) do
+    "[file]({{ \"/assets#{$1}\" | relative_url }}"
   end
 
   post
@@ -35,7 +35,7 @@ CSV.foreach(CSV_PATH, headers: true) do |row|
   content = Base64.decode64(row['content'])
   publish_date = row['publish_date']
   categories = row['categories']
-  categories = "[" + "'" + categories.split(',').join("',") + "'" + "]"
+  categories = "[" + "'" + categories.split(',').join("','") + "'" + "]"
 
   file_name = publish_date.split.first + '-' + slug + '.markdown'
   file_path = File.join(POSTS_PATH, file_name)

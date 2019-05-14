@@ -2,7 +2,7 @@
 layout: post
 title: 'SOLID Design principles and Php: Single responsability'
 date: 2014-01-23 07:23:00
-categories: ['design pattern',laravel',solid']
+categories: ['design pattern','laravel','solid']
 ---
 Hello guys, this is the first article (of 5) About **SOLID** design principles. Solid design principles was written by **Uncle Bob Martin** with the objective to help building quality code. 
 But how can you say that you have written good code? You could say: when the code works its good code, but in fact that's not; in fact the biggest quality of software are that it's easy to **replicate** and easy to **modify**. <!-- more -->

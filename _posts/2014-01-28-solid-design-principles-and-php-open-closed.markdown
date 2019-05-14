@@ -2,7 +2,7 @@
 layout: post
 title: 'SOLID Design principles and Php: Open closed'
 date: 2014-01-28 19:59:00
-categories: ['design pattern',solid']
+categories: ['design pattern','solid']
 ---
 In this article we talk about the O in SOLID principles: **Open closed**. The Open closed principle says that: a class should be open for extension but closed for modification, what that means? Well, in practise when you make a class you could expand it for adding new features but not modify it for changing his beahvior, instead you should separate the extensible behavior behind an interface and flip the dependencies. What that means? I'll drive into that with an example. Let's say we are writing a business application to handle building information in a certain country. Let's create a class to handle small apartments:
 

@@ -2,7 +2,7 @@
 layout: post
 title: 'Javascript multiple inheritance with ES5 and AngularJs'
 date: 2016-03-31 12:55:00
-categories: ['design pattern',javascript']
+categories: ['design pattern','javascript']
 ---
 In this article I'll show you how you can use multiple inheritance(trait) with Javascript EcmaScript 5 and AngularJS 1.0.
 AngularJS offer you a method: _angular.extend_ that allow you to extend any object with the values and methods of other objects.

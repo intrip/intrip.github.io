@@ -2,7 +2,7 @@
 layout: post
 title: 'JSON API error handling with ruby'
 date: 2016-03-29 07:33:00
-categories: ['rest',ruby',ruby on rails']
+categories: ['rest','ruby','ruby on rails']
 ---
 Hello folks, after being inactive for a while I am finally back!  
 This post is about a technique that I found useful for general error handling with REST API and ruby on rails, but the concept works for any programming language/framework.

@@ -2,7 +2,7 @@
 layout: post
 title: 'Laravel Testing Redirect::back()'
 date: 2014-10-22 22:38:00
-categories: ['laravel',testing']
+categories: ['laravel','testing']
 ---
 Hello guys, sometimes in your functional test you need to test a redirect, this is pretty easy to test except for the Laravel Redirect::back() method. I've found out that this is hard to test and the only solution to solve the problem is to fake a HTTP_REFERRER value. 
 <!-- more -->

@@ -2,7 +2,7 @@
 layout: post
 title: 'Php Laravel Single table inheritance'
 date: 2014-01-06 00:00:00
-categories: ['design pattern',laravel']
+categories: ['design pattern','laravel']
 ---
 As i came into OOP (Object-oriented-programming) i started to learn the concept of  "**Inheritance**".  Inheritance itself is a cool stuff, but problems come when you need to save that object structure into a relational database: for example Mysql.
 This article is one of a series that will explain the best-practise approaches to solve that problem.<!-- more -->

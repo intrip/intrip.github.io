@@ -2,7 +2,7 @@
 layout: post
 title: '4 simple rules for better writing method and variables'
 date: 2014-05-14 21:37:00
-categories: ['design pattern',programming rules']
+categories: ['design pattern','programming rules']
 ---
 Programming is an art and programmers are artists. As any artist anyone has a different approach for crafting, besides that there are some common rules that would help you writing better software. In fact is really important to write software not just that "works" but also that is easy to read and unterstand. In fact Brian Kerninghan (C creator) has written: <br/>
 <!-- more -->
