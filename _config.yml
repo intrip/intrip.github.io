@@ -33,8 +33,6 @@ plugins:
 
 # theme settings
 show_excerpts: true
-disqus:
-    shortname: jacopobeschi
 
 # Pagination settings
 paginate: 5
