@@ -24,5 +24,5 @@ If you'd like to know more aboout my development career you could [download my r
 
 If you wanna get in touch with me please send me a message on <a href="https://twitter.com/{{ site.twitter_username }}" title="JacopoBeschi" target="_blank">twitter</a> or <a href="http://www.linkedin.com/in/{{ site.linkedin_username }}" title="jacopobeschi" target="_blank">linkedin</a>.
 
-I've got a master degree in "IT Engineering" at the university of Brescia in 2012
+I've got a master degree in "IT Engineering" at the university of Brescia in 2013.
 
