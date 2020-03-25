@@ -18,7 +18,7 @@ Lately I've been working a lot with <b>Ruby on rails</b>. I use
 create stable and reusable code, but never forget to test my code in acceptance(mostly with capybara).
 Beside I prefer server-side programming I'm trying to keep my knowledge balanced between back-end and front-end.
 
-If you wanna see my open source projects you can check my <a href="https://github.com/intrip" target="blank">github profile page</a>. You can also see some of my contributions for gitlab in my <a href="http://contributors.gitlab.com/contributors/jacopo/commits" target="blank">gitlab contributor page</a>.
+If you wanna see my open source projects you can check my <a href="https://github.com/intrip" target="blank">github profile page</a>. You can also see some of my contributions for gitlab in the <a href="http://contributors.gitlab.com/contributors/jacopo/commits" target="blank">gitlab contributor page</a>.
 
 If you'd like to know more aboout my development career you could [download my resumé.]({{"/assets/attachments/resumé.pdf" | relative_url }})
 
