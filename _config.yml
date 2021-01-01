@@ -15,7 +15,7 @@
 # in the templates via {{ site.myvariable }}.
 title: Jacopo Beschi
 description: >- # this means to ignore newlines until "baseurl:"
-  In this blog you'll find mostly Ruby on Rails, Ruby and web development tips; but you'll also find PHP, Laravel and OOP programming posts.
+  In this blog you'll find mostly Ruby and Ruby on Rails web development tips, but you'll also find PHP, Laravel and OOP programming posts.
   Last but not least SOLID design principles explanation and examples.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://www.jacopobeschi.com" # the base hostname & protocol for your site, e.g. http://example.com
