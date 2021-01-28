@@ -7,7 +7,7 @@ permalink: /about/
 ---
 <h4>
 I'm a software engineer: my current job is leading  <a href="https://www.iubenda.com/en/" target="blank">iubenda</a> backend development team.
-I'm also an OSS contributor and a member of the <a href="https://about.gitlab.com/core-team/" target="_blank">Gitlab Core Team</a>, check my <a href="#oss-contributions">OSS contributions</a>.
+I'm also an avid OSS contributor and a member of the <a href="https://about.gitlab.com/core-team/" target="_blank">Gitlab Core Team</a>, check my <a href="#oss-contributions">OSS contributions</a>.
 </h4>
 ![img]({{"/assets/img/me.jpg" | relative_url }})
 
