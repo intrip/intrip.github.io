@@ -16,41 +16,48 @@ I've created a class that implement the active record pattern(keep in mind it's 
 
 We want to save that data into a Database with the Active record pattern class. The table associated to the class can be created with the following script:
 
-	CREATE TABLE IF NOT EXISTS `phone` (
-  	`id` int(11) NOT NULL AUTO_INCREMENT,
-  	`name` varchar(255) NOT NULL,
-  	`company` varchar(255) NOT NULL,
-  	PRIMARY KEY (`id`)
-	) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+```sql
+CREATE TABLE IF NOT EXISTS `phone` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`name` varchar(255) NOT NULL,
+`company` varchar(255) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 
+```
 
 The table class have this code:
 
-	class MobilePhone extends ActiveRecordModel
-	{
+```php
+class MobilePhone extends ActiveRecordModel
+{
     protected $table_name = 'phone';
     protected $username ='root';
     protected $password = 'root';
     protected $hostname = 'localhost';
     protected $dbname = 'activerecord';
-	}
+}
+```
 
 As you can see the MobilePhone class extends ActiveRecordModel and has some proprieties to know how to connect to the database.  
 <h3>Insert data</h3>
 You can insert a new MobilePhone with the following code.
 
-	// create a new phone
-	$phone = new MobilePhone(array(
-   	 "name" => "cool phone",
-   	 "company" => "nekia"
-	));
+```php
+// create a new phone
+$phone = new MobilePhone(array(
+  "name" => "cool phone",
+  "company" => "nekia"
+));
 
-	// save it
-	$phone->save();
-	
+// save it
+$phone->save();
+```
+
 This looks really simple, lets take a look on how the ActiveRecordModel lets you do that:
 
-	abstract class ActiveRecordModel
-	{
+```php
+abstract class ActiveRecordModel
+{
     /**
      * The attributes that belongs to the table
      * @var  Array
@@ -213,6 +220,7 @@ This looks really simple, lets take a look on how the ActiveRecordModel lets you
         }
     }
 }
+```
 
 What the ActiveRecordClass does when we set the attributes is to call the magic method "__set()" which will set the values in his protected $attributes properties array (they are the same as the columns in the table); in this particular case we setted the data in the constructor which instantly populated the **$attributes** array (check __construct() method). 
 Then we call the save method, that method calls the insert method passing him the values contained in **$attributes**, the insert method will create a new connection and then insert a new row filling the column values with the corresponding **$key->value** pairs of the $attributes array then returns the id of the new row which is setted as property in the $attributes by the save method.
@@ -222,46 +230,50 @@ After you have created a new model you can change his proprieties in the databas
 
 Here is an example:
 
-	$phone->name = "new name!";
-	$phone->save();
+```php
+$phone->name = "new name!";
+$phone->save();
+```
 
 Here is the update method:
 
-	abstract class ActiveRecordModel
-	...
-	 /**
-     * Update the current row with new values
-     *
-     * @param array $values
-     * @return bool
-     * @throws ErrorException
-     * @throws BadMethodCallException
-     */
-    public function update(array $values)
-    {
-        if( ! isset($this->attributes[$this->id_name]))
-            throw new BadMethodCallException("Cannot call update on an object non already fetched");
+```php
+abstract class ActiveRecordModel
+...
+ /**
+   * Update the current row with new values
+   *
+   * @param array $values
+   * @return bool
+   * @throws ErrorException
+   * @throws BadMethodCallException
+   */
+   public function update(array $values)
+   {
+      if( ! isset($this->attributes[$this->id_name]))
+          throw new BadMethodCallException("Cannot call update on an object non already fetched");
 
-        $connection = $this->getConnection();
-        $statement = $this->prepareStatement($connection, $values, "update");
-        foreach($values as $key => $value)
-        {
-            $statement->bindValue(":{$key}", $value);
-        }
-        $statement->bindValue(":{$this->id_name}", $this->attributes[$this->id_name]);
-        $success = $statement->execute();
+      $connection = $this->getConnection();
+      $statement = $this->prepareStatement($connection, $values, "update");
+      foreach($values as $key => $value)
+      {
+         $statement->bindValue(":{$key}", $value);
+      }
+      $statement->bindValue(":{$this->id_name}", $this->attributes[$this->id_name]);
+      $success = $statement->execute();
 
-        // update the current values
-        foreach($values as $key => $value)
-        {
-            $this->setAttribute($key, $value);
-        }
+     // update the current values
+     foreach($values as $key => $value)
+     {
+         $this->setAttribute($key, $value);
+     }
 
-        if(! $success)
-            throw new ErrorException;
+     if(! $success)
+        throw new ErrorException;
 
-        return true;
-    }
+     return true;
+ }
+```
 	
 As you can see the update method create a new update statement from the given $attributes(check the code before), then run the statement and update the data in his **$attributes** array.
 
@@ -269,61 +281,69 @@ As you can see the update method create a new update statement from the given $a
 You can also use the find method or where method to get a class corresponding to a given id or a list of classes corrisponding to a certain condition. 
 Here is an example:
 
-	$same_phone = $phone->find(77);
+```php
+$same_phone = $phone->find(77);
+```
 
 We find a phone with an id equal to 77.
 
 The code of the ActiveRecordModel is that:
 
-	abstract class ActiveRecordModel
-	...
-	 /**
-     * Find a row given the id
-     *
-     * @param $id
-     * @return null|Mixed
-     */
-    public function find($id)
-    {
-        $conn = $this->getConnection();
-        $query = $conn->query("SELECT * FROM {$this->table_name} WHERE  {$this->id_name}= " . $conn->quote($id));
-        $obj = $query->fetch(PDO::FETCH_ASSOC);
+```php
+abstract class ActiveRecordModel
+...
+ /**
+   * Find a row given the id
+   *
+   * @param $id
+   * @return null|Mixed
+   */
+   public function find($id)
+   {
+      $conn = $this->getConnection();
+      $query = $conn->query("SELECT * FROM {$this->table_name} WHERE  {$this->id_name}= " . $conn->quote($id));
+      $obj = $query->fetch(PDO::FETCH_ASSOC);
 
-        return ($obj) ? $this->newInstance($obj) : null;
-    }
+      return ($obj) ? $this->newInstance($obj) : null;
+   }
+```php
 
 In case you want a where condition you can do like that:
 
-	$phone = $phone->where("company='nekia'");
-	
+```php
+$phone = $phone->where("company='nekia'");
+```
+
 you can see the code below:
-	
-	abstract class ActiveRecordModel
-	....
-    /**
-     * Find rows given a where condition
-     *
-     * @param $where_cond
-     * @return null|PDOStatement
-     */
-    public function where($where_cond)
-    {
-        $conn = $this->getConnection();
-        $query = $conn->query("SELECT * FROM {$this->table_name} WHERE {$where_cond}");
-        $objs = $query->fetchAll(PDO::FETCH_ASSOC);
-        // the model instantiated
-        $models = array();
 
-        if(! empty($objs))
-        {
-            foreach($objs as $obj)
-            {
-                $models[] = $this->newInstance($obj);
-            }
-        }
+```php
+abstract class ActiveRecordModel
+....
+  /**
+   * Find rows given a where condition
+   *
+   * @param $where_cond
+   * @return null|PDOStatement
+   */
+   public function where($where_cond)
+   {
+       $conn = $this->getConnection();
+       $query = $conn->query("SELECT * FROM {$this->table_name} WHERE {$where_cond}");
+       $objs = $query->fetchAll(PDO::FETCH_ASSOC);
+       // the model instantiated
+       $models = array();
 
-        return $models;
-    }
+       if(! empty($objs))
+       {
+           foreach($objs as $obj)
+           {
+               $models[] = $this->newInstance($obj);
+           }
+       }
+
+       return $models;
+   }
+```
 
 As you saw in this examples the basic concept of ActiveRecord is to make a one-to-one relationshib between the instance of the class and the row in the database, we also map the attributes of the table in the database with the **attributes** property of the model and we use them as data for the queries. Note that because this example is really simple we build query "on the fly" with the help of php PDO class, but you can create a query class that handles the creation of the query and inject him in the ActiveRecordModel class.
 

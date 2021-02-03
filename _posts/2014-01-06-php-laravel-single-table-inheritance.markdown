@@ -26,20 +26,20 @@ Here is the UML diagram of the class structure:
  ![file]({{ "/assets/img/image-1387843145287.png" | relative_url }})
 
 And here is the code that creates the structure in the db following the pattern:
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 CREATE TABLE ANIMALS (ID int NOT NULL AUTO_INCREMENT, Sex Varchar(255), Name Varchar(255), Collar Varcar(255), Type Varchar(50), PRIMARY KEY ID);
-~~~~~~~~~~~~~~~~~~~~~
+```
 
 What we are doing is to map every node of the hierarchy on the same table, the table contains all the attributes in the hierarchy and also the attribute: "Type" to disntinguish the type of data being saved. 
 
 To be more clear here is an example of the code to insert a new dog:
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 INSERT INTO ANIMALS (Type, Sex, Name, Collar) VALUES ("Dog", "M", "Bobby", "black");
-~~~~~~~~~~~~~~~~~~~~~
+```
 And here is and example to insert a new cat:
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 INSERT INTO ANIMALS (Type, Sex, Name, Collar) VALUES ("Cat","M", "Tom" );
-~~~~~~~~~~~~~~~~~~~~~
+```
 
 The advantages of **Single table inheritance** are:
 <ul>
@@ -55,8 +55,7 @@ The advantages of **Single table inheritance** are:
 </ul>
 
 To handle this problem automatically with **Laravel Framework** i've created a package called **"laravel-single-table-inheritance"** that you can find [here on github](https://github.com/intrip/laravel-single-table-inheritance).
-<br/>In the case you are using doctrine ORM you should check this [examples](http://docs.doctrine-project.org/en/latest/reference/inheritance-mapping.html).
-If you want to understand more about object oriented inheritance follow the guide with [Class table inheritance](http://www.jacopobeschi.com/post/php-class-table-inheritance)
+If you want to understand more about object oriented inheritance follow the guide with [Class table inheritance]({% post_url 2014-01-07-php-class-table-inheritance %})
 
 
 If you liked this article: <a href="https://twitter.com/JacopoBeschi" class="twitter-follow-button" data-show-count="false" data-lang="en">Follow me</a>

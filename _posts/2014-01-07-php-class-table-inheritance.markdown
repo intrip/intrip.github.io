@@ -14,21 +14,21 @@ Here is the UML diagram of the class structure:
 
 And here is the code that creates the structure in the db following the pattern:
 
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 CREATE TABLE ANIMAL (ID int NOT NULL AUTO_INCREMENT, Sex Varchar(255), PRIMARY KEY ID);
-~~~~~~~~~~~~~~~~~~~~~
+```
 
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 CREATE TABLE PET (ID int NOT NULL, Name Varchar(255), PRIMARY KEY ID, FOREIGN KEY (ID) REFERENCES ANIMAL(ID) );
-~~~~~~~~~~~~~~~~~~~~~
+```
 
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 CREATE TABLE DOG (ID int NOT NULL, Collar Varchar(255), PRIMARY KEY ID, FOREIGN KEY (ID) REFERENCES PET(ID) );
-~~~~~~~~~~~~~~~~~~~~~
+```
 
-~~~~~~~~~~~~~~~~~~~~~
+```sql
 CREATE TABLE CAT (ID int NOT NULL, PRIMARY KEY ID, FOREIGN KEY (ID) REFERENCES PET(ID) );
-~~~~~~~~~~~~~~~~~~~~~
+```
 
 As you can see with **Class table inheritance** we create a table for every class; note that we use the **ID** of every subclass as a foreign key for the parent class, in this way we have the same key for the set of tables rappresenting the same leaf class in the hierarchy.
 
