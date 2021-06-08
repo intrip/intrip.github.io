@@ -27,7 +27,7 @@ Below you'll find the key engineering principles in which I believe:
 
 Over the years I've figured out what motivates me and the conditions under which I like to work:
 
-- **Culture**: I enjoy working on open and diversified environment using cross-functional teams, micro-management is not acceptable.
+- **Culture**: From my experience, autonomous people and cross functional-teams working through consensus and helping each other bring the best results. Micro-management is not acceptable.
 - **Role**: I'm mostly knowledged in back-end development using <b>Ruby on Rails</b>, can work on the frontend too but it's not my strongest skill. I do embrace the DevOps movement and have hands on infrastucture management with Kubernetes.
 - **Transparency**: I work more effectively when the company shares as much of the long-term intentions as possible.
 - **Work-life balance**: While I am ok with putting in a few extra hours on rare occasions, regular over-time is not something I do.
