@@ -6,8 +6,8 @@ order: 2
 permalink: /about/
 ---
 <h4>
-I'm a software engineer: my current job is leading  <a href="https://www.iubenda.com/en/" target="blank">iubenda</a> backend development team.
-I'm also an avid OSS contributor and member of the <a href="https://about.gitlab.com/core-team/" target="_blank">Gitlab Core Team</a>.
+I'm currently working for <a href="https://37signals.com" target="_blank">37signals</a> as a Senior programmer in the SIP (Security, Infrastructure, Performance) team.
+I love OSS: I'm a Rails contributor and member of the <a href="https://about.gitlab.com/core-team/" target="_blank">Gitlab Core Team</a>.
 </h4>
 
 ## Principles
