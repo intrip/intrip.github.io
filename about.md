@@ -36,7 +36,7 @@ If you'd like to know about my development career you can [download my resumé.]
 
 ### OSS contributions
 
-Below you can find the list of my OSS contributions:
+Below you can find some of my OSS contributions:
 
 - [Gitlab](https://gitlab.com/gitlab-org/gitlab/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&author_username=jacopo-beschi){:target="_blank"}
 and [GitlabFOSS](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&author_username=jacopo-beschi){:target="_blank"}
@@ -44,6 +44,7 @@ and [GitlabFOSS](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests?scop
 - [Suse Open build service](https://github.com/openSUSE/open-build-service/pulls?q=is%3Apr+is%3Aclosed+author%3Aintrip){:target="_blank"}
 - [Ruby](https://github.com/ruby/ruby/pulls?q=is%3Apr+is%3Aclosed+author%3Aintrip){:target="_blank"}
 - [Test-Prof](https://github.com/test-prof/test-prof/pulls?q=is%3Apr+is%3Aclosed+author%3Aintrip){:target="_blank"}
+- More on my [Github profile](https://github.com/intrip){:target="_blank"}
 
 Currently I'm spending my time diving into Rails internals and working on increasing the amount of my contributions to the project.
 
