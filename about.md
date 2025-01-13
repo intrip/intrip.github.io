@@ -8,6 +8,7 @@ permalink: /about/
 <h4>
 I'm currently working for <a href="https://37signals.com" target="_blank">37signals</a> as a Senior programmer in the SIP (Security, Infrastructure, Performance) team.
 I love OSS: I'm a Rails contributor and member of the <a href="https://about.gitlab.com/core-team/" target="_blank">Gitlab Core Team</a>.
+I'm also interested in privacy and I recently created a Chrome extension to <a href="https://chromewebstore.google.com/detail/gblock-%E2%80%94-block-email-trac/jlnjoejlgadiipndbpilnicleimjfhcb" target="_blank">Protect from Email Tracking</a>.
 </h4>
 
 ## Principles
@@ -15,11 +16,11 @@ I love OSS: I'm a Rails contributor and member of the <a href="https://about.git
 Below you'll find the key engineering principles in which I believe:
 
 - **Not over engineering**: Always try to "do the simple thing", embrace the philosophy of
-<a href="http://en.wikipedia.org/wiki/Reinventing_the_wheel" target="blank">don't reinvent the wheel</a> but *when is required* also do the groundwork.
+<a href="http://en.wikipedia.org/wiki/Reinventing_the_wheel" target="_blank">don't reinvent the wheel</a> but *when is required* also do the groundwork.
 - **Self management**: Don't need a manager which does daily check-ins.
 - **Automation is key**: when something has to be done always consider the trade-off of automating the
     process.
-  - One big part of automation is testing: use <a href="http://en.wikipedia.org/wiki/Test-driven_development" target="blank">TDD development</a> when is fit
+  - One big part of automation is testing: use <a href="http://en.wikipedia.org/wiki/Test-driven_development" target="_blank">TDD development</a> when is fit
     and test the full stack of the application following the [test pyramid principle](https://martinfowler.com/articles/practical-test-pyramid.html){:target="_blank"}.
 - **Write code for humans**: write code to be read by humans, debugged by humans and maintained by humans.
 
